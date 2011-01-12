@@ -23,6 +23,11 @@ get '/stylesheets/:file.css' do
   sass(:"stylesheets/#{params[:file]}", Compass.sass_engine_options)
 end
 
+get '/javascripts/:file.js' do
+  content_type 'text/javascript', :charset => 'utf-8'
+  File.read(File.join(File.dirname(__FILE__), '..', "#{params[:file]}.js"))
+end
+
 get '/stats' do
   content_type :json
 
