@@ -128,15 +128,15 @@
         var stroke_color      = "#FFFFFF",
             fill_color        = line_color,
             point_size        = options.point_size,
-            point_size_hover  = options.point_size,
+            point_size_hover  = options.point_size_hover,
             first_point       = (i == 0 ? true : false);
 
-        if (dates.length > 90) {
-          point_size = 0;
-          point_size_hover = 3;
-        } else if (dates.length > 45) {
+        if (dates.length > 45 && dates.length <= 90) {
           point_size = 3;
           point_size_hover = 5;
+        } else if (dates.length > 90) {
+          point_size = 0;
+          point_size_hover = 3;
         }
 
         if (values[i] < 0) {
