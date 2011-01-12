@@ -94,7 +94,7 @@
             y_offset = 25;
           }
 
-          yscale = this.text(x_offset, y_offset, value).attr('fill', color).attr('font-weight', 'bold').toFront();
+          this.text(x_offset, y_offset, value).attr('fill', color).attr('font-weight', 'bold').toFront();
         }
 
         dv--;
