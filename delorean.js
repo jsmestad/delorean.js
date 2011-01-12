@@ -51,6 +51,56 @@
       }
     }
 
+    // This draws the X Axis (the dates)
+    Raphael.fn.drawXAxis = function(dates, X) {
+      var num_to_skip   = Math.round(dates.length / 11);
+          y_position    = options.height - 8,
+          i             = dates.length;
+
+      var x;
+      while (i--) {
+        if (i == 0 && dates.length < 20) {
+          x = -10;
+        } else if (dates.length > 60 && i == 1) {
+          x = Math.round(X * i) + 5;
+        } else {
+          x = Math.round(X * i);
+        }
+
+        if ((dates.length < 20) || (i != 0 && i % num_to_skip == 1)) {
+          var date = (new Date(dates[i])).strftime(options.date_format);
+          this.text(x, y_position, date).attr({"font-size": "10px", fill: "#AFAFAF"}).toBack();
+        }
+      }
+    };
+
+    // This draws the Y Axis (the scale)
+    Raphael.fn.drawYAxis = function(max, color) {
+      var dv = 4;
+      var max_more = 1.33 * max;
+      var max_less = max / 4;
+      var x_offset = 15;
+      var val, offset_1, y_offset, yscale;
+
+      for (var sc = 0; sc < max_more; sc += max_less) {
+        if (dv >= 1 && dv < 4) {
+          value = displayValue(Math.round(sc), 0);
+
+          if (dv == 2) {
+            y_offset = 75;
+          } else if (dv == 3) {
+            y_offset = 125;
+          } else {
+            y_offset = 25;
+          }
+
+          yscale = this.text(x_offset, y_offset, value).attr('fill', color).attr('font-weight', 'bold').toFront();
+        }
+
+        dv--;
+      }
+    };
+
     Raphael.fn.drawChart = function(X, Y) {
       var dates   = _(data).keys(),
           values  = _(data).values();
@@ -109,74 +159,18 @@
 
         var rect = blanket[blanket.length - 1];
 
-        (function (x, y, data, date, point, idx, position_index) {
-          var timer, i;
+        (function (data, date, point, idx, position_index) {
           rect.hover(function () {
-
-            /*
-            * This is for supporting multiple datasets and sizing them together.
-            *
-            *   for (var d2 in datasets) {
-            *     if (!isNaN(d2) && allPoints[d2].hasItem(date)) {
-            *         var thePoint = allPoints[d2].getItem(date);
-            *         thePoint.attr({
-            *             "r": point_size_hover
-            *         });
-            *     }
-            *   }
-            */
-
             point.attr({"r": point_size_hover});
           }, function () {
             point.attr({"r": point_size});
           });
-        })(x, y, values[i], dates[i], point, 0, i);
+        })(values[i], dates[i], point, 0, i);
 
       }
     };
 
-    Raphael.fn.drawDates = function(dates, X, height) {
-      var num_to_skip = Math.round(dates.length / 11);
-      for (var i = 0, ii = dates.length; i < ii; i++) {
-        var datePos = height - 8;
-        if (dates.length < 20) {
-          if (i == 0) {
-            var x = -10;
-          } else {
-            var x = Math.round(X * i) + 5;
-          }
-        } else if (dates.length > 60 && i == 1) {
-          var x = Math.round(X * i) + 5;
-        } else {
-          var x = Math.round(X * i);
-        }
 
-        if ((dates.length < 20) || (i != 0 && i % num_to_skip == 1)) {
-          var t = this.text(x, datePos, (new Date(dates[i])).strftime(options.date_format)).attr({
-                    "font-size": "10px",
-                    fill: "#afafaf"
-                  }).toBack();
-        }
-      }
-    };
-
-    Raphael.fn.drawYScale = function(max, color) {
-      var dv = 4;
-      for (var sc = 0; sc < (1.33 * max); sc += (max / 4)) {
-        if (dv >= 1 && dv < 4) {
-          var val = displayValue(Math.round(sc), 0);
-          var offset_1 = 15;
-          var y_offset = 25;
-          if (dv == 2) {
-            y_offset = 75;
-          } else if (dv == 3) {
-            y_offset = 125;
-          }
-          var yscale = this.text(offset_1, y_offset, val).attr("fill", color).attr("font-weight", "bold").toFront();
-        }
-        dv--;
-      }
-    };
 
     return {
       init: function(target_, data_, options_) {
@@ -201,9 +195,9 @@
         var X = (options.width / dates.length),
             Y = ((options.height - options.margin_bottom - options.margin_top) / max);
 
-        r.drawDates(dates, X, options.height);
+        r.drawXAxis(dates, X);
         r.drawChart(X, Y);
-        r.drawYScale(max, "#afafaf");
+        r.drawYAxis(max, "#AFAFAF");
       }
     };
   };
