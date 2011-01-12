@@ -62,6 +62,17 @@ This library depends on the following:
     
   })(jQuery);
 
+The data format that Delorean.js accepts looks like:
+
+  {
+    "2011-10-08T09:30:00Z":"890234",
+    "2010-12-31T09:30:00Z":"590234",
+    "2010-12-30T09:30:00Z":"3024",
+    "2010-12-29T09:30:00Z":"29134",
+    "2010-12-28T09:30:00Z":"82372",
+    ....
+  }
+
 == Note on Patches/Pull Requests
  
 * Fork the project.
