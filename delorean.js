@@ -76,28 +76,30 @@
 
     // This draws the Y Axis (the scale)
     Raphael.fn.drawYAxis = function(max, color) {
-      var dv = 4;
-      var max_more = 1.33 * max;
-      var max_less = max / 4;
-      var x_offset = 15;
-      var val, offset_1, y_offset, yscale;
+      var display = 4,
+          max_more = 1.33 * max,
+          max_less = max / 4,
+          offset_x = 15,
+          offset_y = 25;
 
-      for (var sc = 0; sc < max_more; sc += max_less) {
-        if (dv >= 1 && dv < 4) {
-          value = displayValue(Math.round(sc), 0);
+      var value, text_node;
 
-          if (dv == 2) {
-            y_offset = 75;
-          } else if (dv == 3) {
-            y_offset = 125;
-          } else {
-            y_offset = 25;
+      for (var scale = 0; scale < max_more; scale += max_less) {
+        if (display >= 1 && display < 4) {
+          
+          if (display === 2) {
+            offset_y = 75;
+          }
+          else if (display === 3) {
+            offset_y = 125;
           }
 
-          this.text(x_offset, y_offset, value).attr('fill', color).attr('font-weight', 'bold').toFront();
+          value = displayValue(Math.round(scale), 0);
+
+          this.text(offset_x, offset_y, value).attr('fill', color).attr('font-weight', 'bold').toFront();
         }
 
-        dv--;
+        display--;
       }
     };
 
