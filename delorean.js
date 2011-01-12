@@ -79,24 +79,24 @@
       var display = 4,
           max_more = 1.33 * max,
           max_less = max / 4,
-          offset_x = 15,
-          offset_y = 25;
+          offset_x = 15;
 
-      var value, text_node;
+      var value, offset_y;
 
       for (var scale = 0; scale < max_more; scale += max_less) {
         if (display >= 1 && display < 4) {
           
           if (display === 2) {
             offset_y = 75;
-          }
-          else if (display === 3) {
+          } else if (display === 3) {
             offset_y = 125;
+          } else {
+            offset_y = 25;
           }
 
           value = displayValue(Math.round(scale), 0);
 
-          this.text(offset_x, offset_y, value).attr('fill', color).attr('font-weight', 'bold').toFront();
+          this.text(offset_x, offset_y, value).attr({'font-weight': 'bold','fill': color}).toFront();
         }
 
         display--;

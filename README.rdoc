@@ -25,10 +25,10 @@ all of them.
 
 This library depends on the following:
 
-  * jQuery (~> 1.4+)
-  * Raphael.js (~> 1.5.2+)
-  * Underscore.js (~> 1.1.3)
-  * strftime.js (included in this project)
+* jQuery (~> 1.4+)
+* Raphael.js (~> 1.5.2+)
+* Underscore.js (~> 1.1.3)
+* strftime.js (included in this project)
  
 == Basic Usage
 
