@@ -16,9 +16,11 @@
       date_format: '%m/%d',
       width: 698,
       height: 200,
-      margin_left: 80,
-      margin_bottom: 0,
-      margin_top: 0,
+      label_display_count: 3,
+      label_offset: 15,
+      margin_left: 5,
+      margin_bottom: 5,
+      margin_top: 5,
       text_date: {
         "font-size": "10px",
         fill: "#333333"
@@ -66,6 +68,7 @@
         } else {
           x = Math.round(X * i);
         }
+        x += options.margin_left;
 
         if ((dates.length < 20) || (i != 0 && i % num_to_skip == 1)) {
           var date = (new Date(dates[i])).strftime(options.date_format);
@@ -76,29 +79,25 @@
 
     // This draws the Y Axis (the scale)
     Raphael.fn.drawYAxis = function(max, color) {
-      var display = 4,
-          max_more = 1.33 * max,
-          max_less = max / 4,
-          offset_x = 15;
+      var display  = (options.label_display_count + 1),
+          max_more = max * 1.33,
+          max_less = max / display,
+          offset_x = options.label_offset;
+
+      var y_spacing = Math.round((options.height - options.margin_bottom - options.margin_top) / (display));
 
       var value, offset_y;
 
+      // Start from lower number and go up to higher numbers
+      offset_y = (y_spacing * display);
+
       for (var scale = 0; scale < max_more; scale += max_less) {
-        if (display >= 1 && display < 4) {
-          
-          if (display === 2) {
-            offset_y = 75;
-          } else if (display === 3) {
-            offset_y = 125;
-          } else {
-            offset_y = 25;
-          }
-
+        log(display, scale);
+        if (display >= 1 && scale > 0) {
           value = displayValue(Math.round(scale), 0);
-
           this.text(offset_x, offset_y, value).attr({'font-weight': 'bold','fill': color}).toFront();
         }
-
+        offset_y -= y_spacing;
         display--;
       }
     };
@@ -142,10 +141,6 @@
         if (values[i] < 0) {
           y = Math.round(options.height - margin_bottom - Y * 0);
         }
-        
-        // TODO: This is aesthetic settings
-        // y = y - 20;
-        // if (i == 0) { x = -10; }
 
         if (dates.length < 45) {
           bgp[(first_point ? "lineTo" : "cplineTo")](x, y, 10);
