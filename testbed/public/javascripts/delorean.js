@@ -1,5 +1,5 @@
 /*
-* jQuery Delorean: Raphael-based Time Series graphs
+*  Delorean.js -- Raphael-based time series graphing library
 *  This work is Copyright by Justin Smestad
 *  It is licensed under the Apache License 2.0
 *  
