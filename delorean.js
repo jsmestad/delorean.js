@@ -179,7 +179,7 @@
             max     = _.max(_(data).values());
 
         var X = (options.width / dates.length),
-            Y = ((options.height - options.margin_bottom - options.margin_top) / max);
+            Y = (options.height - options.margin_bottom - options.margin_top) / max;
 
         r.drawXAxis(dates, X);
         r.drawChart(X, Y);
