@@ -82,16 +82,12 @@
           offset_x = options.label_offset;
 
       var y_spacing = Math.round((options.height - options.margin_bottom - options.margin_top) / display);
-
-      var value, offset_y;
-
-      // Start from lower number and go up to higher numbers
-      offset_y = (y_spacing * display);
+      var offset_y = (y_spacing * display); // Start from lower number and go up to higher numbers
 
       for (var scale = 0; scale < max_more; scale += max_less) {
         if (display >= 1 && scale > 0) {
-          value = displayValue(Math.round(scale), 0);
-          this.text(offset_x, offset_y, value).attr({'font-weight': 'bold','fill': color}).toFront();
+          this.text(offset_x, offset_y, displayValue(Math.round(scale), 0))
+            .attr({'font-weight': 'bold','fill': color}).toFront();
         }
         offset_y -= y_spacing;
         display--;
@@ -152,13 +148,13 @@
 
         var rect = blanket[blanket.length - 1];
 
-        (function (data, date, point, idx, position_index) {
-          rect.hover(function () {
+        (function(point) {
+          rect.hover(function() {
             point.attr({"r": point_size_hover});
-          }, function () {
+          }, function() {
             point.attr({"r": point_size});
           });
-        })(values[i], dates[i], point, 0, i);
+        })(point);
 
       }
     };
@@ -180,9 +176,8 @@
       render: function() {
         var r       = Raphael($chart.get(0), options.width, options.height),
             dates   = _(data).keys(),
-            values  = _(data).values(),
-            max     = _(values).max();
-        
+            max     = _.max(_(data).values());
+
         var X = (options.width / dates.length),
             Y = ((options.height - options.margin_bottom - options.margin_top) / max);
 
