@@ -36,10 +36,20 @@ get '/stats' do
   stats = {}
   random = Random.new
   sequence_length.downto(0) do |i|
-    stats[i.days.ago.utc.strftime("%Y-%m-%dT%H:%M:%SZ")] ||= random.rand(1...1000000)
+    if params[:multi_line].present?
+      value_array = []
+      params[:multi_line].to_i.times { |i| value_array << random.rand(1...1000000) }
+      stats[i.days.ago.utc.strftime("%Y-%m-%dT%H:%M:%SZ")] ||= value_array
+    else
+      stats[i.days.ago.utc.strftime("%Y-%m-%dT%H:%M:%SZ")] ||= random.rand(1...1000000)
+    end
   end
 
   stats.to_json
+end
+
+get '/multiple_lines' do
+  haml :multiple_lines
 end
 
 get '/' do

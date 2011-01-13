@@ -176,13 +176,19 @@
       render: function() {
         var r       = Raphael($chart.get(0), options.width, options.height),
             dates   = _(data).keys(),
-            max     = _.max(_(data).values());
+            values  = _(data).values();
+
+        if(_.isArray(values[0])) {
+          var max = _(_(values).flatten()).max();
+        } else {
+          var max = _(values).max();
+        }
 
         var X = (options.width / dates.length),
             Y = (options.height - options.margin_bottom - options.margin_top) / max;
 
         r.drawXAxis(dates, X);
-        r.drawChart(X, Y);
+        // r.drawChart(X, Y);
         r.drawYAxis(max, "#AFAFAF");
       }
     };
