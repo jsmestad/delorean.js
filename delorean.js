@@ -101,23 +101,27 @@
       var margin_left   = options.margin_left,
           margin_bottom = options.margin_bottom,
           margin_top    = options.margin_top,
-          stroke_width  = (dates.length > 45 ? options.stroke_width_dense : options.stroke_width),
-          line_color    = options.line_colors[1];
+          stroke_width  = (dates.length > 45 ? options.stroke_width_dense : options.stroke_width);
 
-      var path    = this.path().attr({stroke: line_color, "stroke-width": stroke_width, "stroke-linejoin": "round"}),
-          bgp     = this.path().attr({stroke: "none", opacity: 0.0, fill: line_color})
-                      .moveTo(margin_left + X * -0.5, options.height - margin_bottom),
-          blanket = this.set();
+      var line_paths = []
+      for (var k = 0, kk = values[0].length; k < kk; k++) {
+        line_paths[k] = this.path().attr({stroke: options.line_colors[k], "stroke-width": stroke_width, "stroke-linejoin": "round"});
+      }
+      // Not sure if we need this yet. 
+      // var bgp = this.path().attr({stroke: "none", opacity: 0.0, fill: line_color})
+                      // .moveTo(margin_left + X * -0.5, options.height - margin_bottom),
+      var layer = this.set();
+      var point_array = {};
 
       var tooltip_visible = false,
           leave_timer     = null;
 
       for (var i = 0, ii = dates.length; i < ii; i++) {
-        var x = Math.round(X * i),
-            y = Math.round(options.height - margin_bottom - Y * values[i]);
+        var x = Math.round(X * i);
+
+        point_array[x] = [];
 
         var stroke_color      = "#FFFFFF",
-            fill_color        = line_color,
             point_size        = options.point_size,
             point_size_hover  = options.point_size_hover,
             first_point       = (i == 0 ? true : false);
@@ -130,31 +134,42 @@
           point_size_hover = 3;
         }
 
-        if (values[i] < 0) {
-          y = Math.round(options.height - margin_bottom - Y * 0);
+        for (var j = 0, jj = values[i].length; j < jj; j++) {
+          var value = values[i][j];
+          var y = Math.round(options.height - margin_bottom - Y * value);
+
+          if (value < 0) {
+            y = Math.round(options.height - margin_bottom - Y * 0);
+          }
+
+          if (dates.length < 45) {
+            // bgp[(first_point ? "lineTo" : "cplineTo")](x, y, 10);
+            line_paths[j][(first_point ? "moveTo" : "cplineTo")](x, y, 10);
+          } else {
+            // bgp[(first_point ? "lineTo" : "lineTo")](x, y, 10);
+            line_paths[j][(first_point ? "moveTo" : "lineTo")](x, y, 10);
+          }
+
+          point = this.circle(x, y, point_size).attr({fill: options.line_colors[j], stroke: stroke_color});
+          point.insertAfter(line_paths[j]);
+
+          point_array[x].push(point);
         }
 
-        if (dates.length < 45) {
-          bgp[(first_point ? "lineTo" : "cplineTo")](x, y, 10);
-          path[(first_point ? "moveTo" : "cplineTo")](x, y, 10);
-        } else {
-          bgp[(first_point ? "lineTo" : "lineTo")](x, y, 10);
-          path[(first_point ? "moveTo" : "lineTo")](x, y, 10);
-        }
+        layer.push(this.rect(X * i, 0, X, options.height - margin_bottom)
+             .attr({stroke: "none", fill: "#FFFFFF", opacity: 0}));
 
-        point = this.circle(x, y, point_size).attr({fill: fill_color, stroke: stroke_color});
-        blanket.push(this.rect(X * i, 0, X, options.height - margin_bottom)
-               .attr({stroke: "none", fill: "#FFFFFF", opacity: 0}));
-
-        var rect = blanket[blanket.length - 1];
-
-        (function(point) {
+        (function(rect, points, x) {
           rect.hover(function() {
-            point.attr({"r": point_size_hover});
+            _.each(points[x], function(point) {
+              point.attr({"r": point_size_hover});
+            });
           }, function() {
-            point.attr({"r": point_size});
+            _.each(points[x], function(point) {
+              point.attr({"r": point_size});
+            });
           });
-        })(point);
+        })(layer[layer.length - 1], point_array, x);
 
       }
     };
@@ -182,6 +197,10 @@
           var max = _(_(values).flatten()).max();
         } else {
           var max = _(values).max();
+          _.each(data, function(value, key) {
+            data[key] = [value];
+          });
+          log(data);
         }
 
         var X = (options.width / dates.length),
