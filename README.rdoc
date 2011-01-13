@@ -1,6 +1,6 @@
 = delorean.js
 
-Delorean.js is a charting library for time-based graphs built on top of Raphael.js
+Delorean.js is a charting library for time-based graphs utilizing SVG through Raphael.js
 
 You can see a live demo: http://deloreanjs.heroku.com
 
@@ -19,7 +19,7 @@ all of them.
 * Graph can visually scale from 7 days to 6 months of data (7 to 180 points)
 * Options can be passed in to modify all visual aspects (WIP)
 * Support for multiple plot lines (WIP)
-* Tooltips (WIP)
+* Tool tips (WIP)
 
 == Requirements
 
@@ -62,7 +62,7 @@ This library depends on the following:
     
   })(jQuery);
 
-The data format that Delorean.js accepts looks like:
+The data format that Delorean.js accepts looks like (for single line plots):
 
   {
     "2011-10-08T09:30:00Z":"890234",
@@ -73,13 +73,26 @@ The data format that Delorean.js accepts looks like:
     ....
   }
 
+The data format for multi-line plots looks like:
+
+*NOTE* You must ensure that your date values at consistent intervals.
+
+  {
+    "2011-10-08T09:30:00Z": [890234, 283749],
+    "2010-12-31T09:30:00Z": [590234, 827],
+    "2010-12-30T09:30:00Z": [3024, null],
+    "2010-12-29T09:30:00Z": [29134, 9827],
+    "2010-12-28T09:30:00Z": [82372, 132],
+    ....
+  }
+
 == Note on Patches/Pull Requests
  
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
   future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
+* Commit, do not mess with version or history.
   (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
