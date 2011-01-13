@@ -36,8 +36,6 @@
     };
 
     function log() {
-      log.history = log.history || [];   // store logs to an array for reference
-      log.history.push(arguments);
       if (window.console) {
         console.log(Array.prototype.slice.call(arguments));
       }
@@ -68,7 +66,6 @@
         } else {
           x = Math.round(X * i);
         }
-        x += options.margin_left;
 
         if ((dates.length < 20) || (i != 0 && i % num_to_skip == 1)) {
           var date = (new Date(dates[i])).strftime(options.date_format);
@@ -84,7 +81,7 @@
           max_less = max / display,
           offset_x = options.label_offset;
 
-      var y_spacing = Math.round((options.height - options.margin_bottom - options.margin_top) / (display));
+      var y_spacing = Math.round((options.height - options.margin_bottom - options.margin_top) / display);
 
       var value, offset_y;
 
@@ -92,7 +89,6 @@
       offset_y = (y_spacing * display);
 
       for (var scale = 0; scale < max_more; scale += max_less) {
-        log(display, scale);
         if (display >= 1 && scale > 0) {
           value = displayValue(Math.round(scale), 0);
           this.text(offset_x, offset_y, value).attr({'font-weight': 'bold','fill': color}).toFront();
@@ -166,8 +162,6 @@
 
       }
     };
-
-
 
     return {
       init: function(target_, data_, options_) {

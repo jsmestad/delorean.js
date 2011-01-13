@@ -1,0 +1,14 @@
+= Delorean.js TODO
+
+== Features
+
+* Document the options hash on the Github Wiki
+* Add support for multiple lines on the same graph
+* Add aggregate tooltip support for each date (display info and highlight all values for a given date)
+* Add ability to turn of select plot lines
+* Draw a graphing matrix around the charting area (make this configurable on/off)
+
+== Chores
+
+* Ensure that margins are used when calculating plot points and labels
+  
