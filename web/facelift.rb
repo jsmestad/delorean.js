@@ -9,8 +9,8 @@ require 'active_support/all'
 
 set :app_file, __FILE__
 set :root, File.dirname(__FILE__)
-set :views, 'views'
-set :public, 'public'
+set :views, File.join(File.dirname(__FILE__), 'views')
+set :public, File.join(File.dirname(__FILE__), 'public')
 
 configure do
   Compass.add_project_configuration(File.join(Sinatra::Application.root, 'config.rb'))
