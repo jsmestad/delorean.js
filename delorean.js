@@ -101,7 +101,7 @@
       var margin_left   = options.margin_left,
           margin_bottom = options.margin_bottom,
           margin_top    = options.margin_top,
-          stroke_width  = ((dates.length > 45) ? options.stroke_width_dense : options.stroke_width),
+          stroke_width  = (dates.length > 45 ? options.stroke_width_dense : options.stroke_width),
           line_color    = options.line_colors[1];
 
       var path    = this.path().attr({stroke: line_color, "stroke-width": stroke_width, "stroke-linejoin": "round"}),
