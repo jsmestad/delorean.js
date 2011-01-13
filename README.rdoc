@@ -16,10 +16,10 @@ all of them.
 
 == Features
 
-  * Graph can visually scale from 7 days to 6 months of data (7 to 180 points)
-  * Options can be passed in to modify all visual aspects (WIP)
-  * Support for multiple plot lines (WIP)
-  * Tooltips (WIP)
+* Graph can visually scale from 7 days to 6 months of data (7 to 180 points)
+* Options can be passed in to modify all visual aspects (WIP)
+* Support for multiple plot lines (WIP)
+* Tooltips (WIP)
 
 == Requirements
 
