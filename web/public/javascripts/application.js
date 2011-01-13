@@ -5,28 +5,28 @@
     // Single Lines
     if ($('#week_chart').length) {
       $.getJSON('/stats?sequence_length=7', function(stats) {
-        var chart = $.delorean('#week_chart', stats, {});
+        var chart = $.delorean('#week_chart', stats, {width: 780});
         chart.render();
       });
     }
 
     if ($('#month_chart').length) {
       $.getJSON('/stats?sequence_length=30', function(stats) {
-        var chart = $.delorean('#month_chart', stats, {});
+        var chart = $.delorean('#month_chart', stats, {width: 780});
         chart.render();
       });
     }
 
     if ($('#quarter_chart').length) {
       $.getJSON('/stats?sequence_length=90', function(stats) {
-        var chart = $.delorean('#quarter_chart', stats, {});
+        var chart = $.delorean('#quarter_chart', stats, {width: 780});
         chart.render();
       });
     }
 
     if ($('#semiannual_chart').length) {
       $.getJSON('/stats?sequence_length=180', function(stats) {
-        var chart = $.delorean('#semiannual_chart', stats, {});
+        var chart = $.delorean('#semiannual_chart', stats, {width: 780});
         chart.render();
       });
     }
@@ -34,28 +34,28 @@
     // Multiple Lines
     if ($('#multi_week_chart').length) {
       $.getJSON('/stats?sequence_length=7&multi_line=2', function(stats) {
-        var chart = $.delorean('#multi_week_chart', stats, {});
+        var chart = $.delorean('#multi_week_chart', stats, {width: 780});
         chart.render();
       });
     }
 
     if ($('#multi_month_chart').length) {
-      $.getJSON('/stats?sequence_length=30&multi_line=2', function(stats) {
-        var chart = $.delorean('#multi_month_chart', stats, {});
+      $.getJSON('/stats?sequence_length=30&multi_line=4', function(stats) {
+        var chart = $.delorean('#multi_month_chart', stats, {width: 780});
         chart.render();
       });
     }
 
-    if ($('#multi_quarter_length').length) {
-      $.getJSON('/stats?sequence_length=90&multi_line=2', function(stats) {
-        var chart = $.delorean('#multi_quarter_length', stats, {});
+    if ($('#multi_quarter_chart').length) {
+      $.getJSON('/stats?sequence_length=90&multi_line=3', function(stats) {
+        var chart = $.delorean('#multi_quarter_chart', stats, {width: 780});
         chart.render();
       });
     }
 
     if ($('#multi_semiannual_chart').length) {
       $.getJSON('/stats?sequence_length=180&multi_line=2', function(stats) {
-        var chart = $.delorean('#multi_semiannual_chart', stats, {});
+        var chart = $.delorean('#multi_semiannual_chart', stats, {width: 780});
         chart.render();
       });
     }
