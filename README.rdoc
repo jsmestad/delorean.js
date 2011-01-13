@@ -2,7 +2,7 @@
 
 Delorean.js is a charting library for time-based graphs built on top of Raphael.js
 
-You can see a live demo: http://deloreanjs.heroku.com/
+You can see a live demo: http://deloreanjs.heroku.com
 
 == Motivations
 
