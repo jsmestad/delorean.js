@@ -144,7 +144,7 @@
 
         point = this.circle(x, y, point_size).attr({fill: fill_color, stroke: stroke_color});
         blanket.push(this.rect(X * i, 0, X, options.height - margin_bottom)
-               .attr({stroke: "none",fill: "#FFFFFF", opacity: 0}));
+               .attr({stroke: "none", fill: "#FFFFFF", opacity: 0}));
 
         var rect = blanket[blanket.length - 1];
 
@@ -188,7 +188,7 @@
             Y = (options.height - options.margin_bottom - options.margin_top) / max;
 
         r.drawXAxis(dates, X);
-        // r.drawChart(X, Y);
+        r.drawChart(X, Y);
         r.drawYAxis(max, "#AFAFAF");
       }
     };
