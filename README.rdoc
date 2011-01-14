@@ -17,8 +17,9 @@ all of them.
 == Features
 
 * Graph can visually scale from 7 days to 6 months of data (7 to 180 points)
+* Support for multiple plot lines
+* Aggregate point support for each date (highlight all values for a given date)
 * Options can be passed in to modify all visual aspects (WIP)
-* Support for multiple plot lines (WIP)
 * Tool tips (WIP)
 
 == Requirements
