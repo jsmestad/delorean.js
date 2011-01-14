@@ -41,6 +41,16 @@
       }
     };
 
+    function parseDate(date) {
+      d = new Date(date);
+      if (isNaN(d)) {
+        log("This browser's Date constructor not support ISO8601.");
+        d = new Date();
+        d.setISO8601(date);
+      }
+      return d;
+    }
+
     function displayValue(value, precision) {
       if (value >= 0 && value < 1000) {
         return value + '';
@@ -68,7 +78,7 @@
         }
 
         if ((dates.length < 20) || (i != 0 && i % num_to_skip == 1)) {
-          var date = (new Date(dates[i])).strftime(options.date_format);
+          var date = parseDate(dates[i]).strftime(options.date_format);
           this.text(x, y_position, date).attr({"font-size": "10px", fill: "#AFAFAF"}).toBack();
         }
       }
@@ -184,7 +194,7 @@
         data = data_;
         var array_length = data.length;
         while (array_length--) {
-          data[array_length] = new Date(data[array_length]);
+          data[array_length] = parseDate(data[array_length]);
         }
       },
 
