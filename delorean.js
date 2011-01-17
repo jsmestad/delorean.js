@@ -145,7 +145,7 @@
 
       // Not sure if we need this yet.
       // var bgp = this.path().attr({stroke: 'none', opacity: 0.0, fill: line_color})
-      // .moveTo(margin_left + X * -0.5, options.height - margin_bottom),
+      //             .moveTo(margin_left + X * -0.5, options.height - margin_bottom),
 
       var layer = this.set();
       var point_array = [];
@@ -205,15 +205,15 @@
         }));
 
         layer[layer.length - 1].hover(function() {
-          _.each(point_array[x], function(pt) {
-            pt.attr({
+          _.each(point_array[x], function(point) {
+            point.attr({
               r: point_size_hover
             });
           });
         },
         function() {
-          _.each(point_array[x], function(pt) {
-            pt.attr({
+          _.each(point_array[x], function(point) {
+            point.attr({
               r: point_size
             });
           });
@@ -250,15 +250,13 @@
           _.each(data, function(value, key) {
             data[key] = [value];
           });
-
-          log(data);
         }
 
-        var x = options.width / dates.length;
-        var y = (options.height - options.margin_bottom - options.margin_top) / max;
+        var X = options.width / dates.length;
+        var Y = (options.height - options.margin_bottom - options.margin_top) / max;
 
-        r.drawXAxis(dates, x);
-        r.drawChart(x, y);
+        r.drawXAxis(dates, X);
+        r.drawChart(X, Y);
         r.drawYAxis(max, '#afafaf');
       }
     };
@@ -269,4 +267,5 @@
     delorean.init(target, data, options);
     return delorean;
   };
+
 })(jQuery, this, this.document);
