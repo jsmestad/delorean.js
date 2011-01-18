@@ -24,7 +24,7 @@
         '#9440ed'
       ],
       date_format: '%m/%d',
-      width: 698,
+      width: '100%',
       height: 200,
       label_display_count: 3,
       label_offset: 15,
@@ -32,7 +32,7 @@
       margin_bottom: 5,
       margin_top: 5,
       text_date: {
-        fill: '#333',
+        'fill': '#333',
         'font-size': '10px'
       },
       text_metric: {
@@ -96,7 +96,7 @@
           date = parseDate(dates[i]).strftime(options.date_format);
           this.text(x, y_position, date).attr({
             'font-size': '10px',
-            fill: '#afafaf'
+            'fill': '#afafaf'
           }).toBack();
         }
       }
@@ -116,7 +116,7 @@
       for (var scale = 0; scale < max_more; scale += max_less) {
         if (display >= 1 && scale > 0) {
           this.text(offset_x, offset_y, displayValue(Math.round(scale), 0)).attr({
-            fill: color,
+            'fill': color,
             'font-weight': 'bold'
           }).toFront();
         }
@@ -137,7 +137,7 @@
 
       for (var k = 0, kk = values[0].length; k < kk; k++) {
         line_paths[k] = this.path().attr({
-          stroke: options.line_colors[k],
+          'stroke': options.line_colors[k],
           'stroke-width': stroke_width,
           'stroke-linejoin': 'round'
         });
@@ -199,25 +199,27 @@
         }
 
         layer.push(this.rect(X * i, 0, X, options.height - margin_bottom).attr({
-          stroke: 'none',
-          fill: '#fff',
-          opacity: 0
+          'stroke': 'none',
+          'fill': '#fff',
+          'opacity': 0
         }));
 
-        layer[layer.length - 1].hover(function() {
-          _.each(point_array[x], function(point) {
-            point.attr({
-              r: point_size_hover
+        (function(rect, points, x) {
+          rect.hover(function() {
+            _.each(points[x], function(point) {
+              point.attr({
+                'r': point_size_hover
+              });
+            });
+          },
+          function() {
+            _.each(points[x], function(point) {
+              point.attr({
+                'r': point_size
+              });
             });
           });
-        },
-        function() {
-          _.each(point_array[x], function(point) {
-            point.attr({
-              r: point_size
-            });
-          });
-        });
+        })(layer[layer.length - 1], point_array, x);
       }
     };
 
