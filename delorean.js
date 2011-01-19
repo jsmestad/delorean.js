@@ -24,7 +24,7 @@
         '#9440ed'
       ],
       date_format: '%m/%d',
-      width: '100%',
+      width: 700,
       height: 200,
       label_display_count: 3,
       label_offset: 15,
