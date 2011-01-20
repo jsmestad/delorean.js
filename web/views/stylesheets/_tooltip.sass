@@ -1,0 +1,26 @@
+// `Tool-Tip
+// ----------------------------------------------------------------------------------------------------
+
+#tooltip,
+#tooltip_inner
+  border: 1px solid
+
+#tooltip
+  @include border-radius(5px)
+  @include box-shadow(rgba(0, 0, 0, 0.5), 0, 1px, 3px)
+  background: #fff
+  border-color: #666
+  display: none
+  font-size: 10px
+  line-height: 2
+  padding: 1px
+  position: absolute
+  left: -9999px
+  min-width: 100px
+  z-index: 9999
+
+#tooltip_inner
+  @include border-radius(4px)
+  background: #f9f9f9
+  border-color: #ccc
+  padding: 5px 10px
