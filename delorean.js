@@ -42,7 +42,8 @@
       stroke_width: 4,
       stroke_width_dense: 2,
       point_size: 5,
-      point_size_hover: 7
+      point_size_hover: 7,
+      enable_tooltips: false
     };
 
     function log() {
@@ -96,7 +97,7 @@
 
   		// Move tooltip.
       tooltip.css({
-  			'top': (event_y + tooltip_y > svg_y) ? event_y - tooltip_y : event_y,
+  			'top': (event_y + tooltip_y > svg_y) ? event_y - (tooltip_y / 2) : event_y,
   			'left': (event_x + tooltip_x + 20 > svg_x) ? event_x - tooltip_x - 15 : event_x + 20
   		});
     }
@@ -243,8 +244,9 @@
 
             $('#tooltip').hide();
           }).mousemove(function(event) {
-            log(values[x]);
-            tooltip(event, values[x]);
+            if(options.enable_tooltips) {
+              tooltip(event, values[x]);
+            }
           });
         })(layer[layer.length - 1], point_array, x, values_array);
       }
