@@ -32,13 +32,15 @@
       margin_bottom: 5,
       margin_top: 5,
       text_date: {
-        'fill': '#333',
+        'fill': '#999',
         'font-size': '10px'
       },
       text_metric: {
         'font-size': '13px',
         'font-family': 'Arial, san-serif'
       },
+      grid_color: '#f5f5f5',
+      display_grid: true,
       stroke_width: 4,
       stroke_width_dense: 2,
       point_size: 5,
@@ -100,7 +102,7 @@
   			'top': (event_y + tooltip_y > svg_y) ? event_y - (tooltip_y / 2) : event_y,
   			'left': (event_x + tooltip_x + 20 > svg_x) ? event_x - tooltip_x - 15 : event_x + 20
   		});
-    }
+    };
 
     // This draws the X Axis (the dates).
     Raphael.fn.drawXAxis = function(dates, X) {
@@ -111,12 +113,11 @@
       var i = dates_length;
 
       while (i--) {
+        x = Math.round(X * i);
         if (i === 0 && dates_length < 20) {
           x = -10;
-        } else if (dates_length > 60 && i === 1) {
-          x = Math.round(X * i) + 5;
-        } else {
-          x = Math.round(X * i);
+        } else if (i === 1 && dates_length > 60) {
+          x += 5;
         }
 
         if ((dates_length < 20) || (i !== 0 && i % num_to_skip === 1)) {
@@ -130,7 +131,7 @@
     };
 
     // This draws the Y Axis (the scale).
-    Raphael.fn.drawYAxis = function(max, color) {
+    Raphael.fn.drawYAxis = function(max) {
       var display = options.label_display_count + 1;
       var max_more = max * 1.33;
       var max_less = max / display;
@@ -142,8 +143,18 @@
 
       for (var scale = 0; scale < max_more; scale += max_less) {
         if (display >= 1 && scale > 0) {
+
+          for (var j = 0; j <= 1; j++) {
+            var t = (j === 1 ? offset_y + (y_spacing / 2) : offset_y);
+            this.path(["M", offset_x, t, "H", options.width - 5]).attr({'stroke': options.grid_color}).toBack();
+
+            if (display === 1 && j === 1) {
+              this.path(["M", offset_x, offset_y - (y_spacing / 2), "H", options.width - 5]).attr({'stroke': options.grid_color}).toBack();
+            }
+          }
+
           this.text(offset_x, offset_y, displayValue(Math.round(scale), 0)).attr({
-            'fill': color,
+            'fill': options.text_date['fill'],
             'font-weight': 'bold'
           }).toFront();
         }
@@ -241,7 +252,6 @@
                 'r': point_size
               });
             });
-
             $('#tooltip').hide();
           }).mousemove(function(event) {
             if(options.enable_tooltips) {
@@ -287,7 +297,7 @@
 
         r.drawXAxis(dates, X);
         r.drawChart(X, Y);
-        r.drawYAxis(max, '#afafaf');
+        r.drawYAxis(max);
       }
     };
   };
