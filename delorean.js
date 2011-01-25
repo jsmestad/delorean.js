@@ -171,10 +171,6 @@
         });
       }
 
-      // Not sure if we need this yet.
-      // var bgp = this.path().attr({stroke: 'none', opacity: 0.0, fill: line_color})
-      //             .moveTo(margin_left + X * -0.5, options.height - margin_bottom),
-
       var layer = this.set();
       var point_array = [];
       var tooltip_visible = false;
@@ -209,11 +205,9 @@
           }
 
           if (dates_length < 45) {
-            // bgp[(first_point ? 'lineTo' : 'cplineTo')](x, y, 10);
             line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 10);
           }
           else {
-            // bgp[(first_point ? 'lineTo' : 'lineTo')](x, y, 10);
             line_paths[j][(first_point ? 'moveTo' : 'lineTo')](x, y, 10);
           }
 
