@@ -144,12 +144,14 @@
       for (var scale = 0; scale < max_more; scale += max_less) {
         if (display >= 1 && scale > 0) {
 
-          for (var j = 0; j <= 1; j++) {
-            var t = (j === 1 ? offset_y + (y_spacing / 2) : offset_y);
-            this.path(["M", offset_x, t, "H", options.width - 5]).attr({'stroke': options.grid_color}).toBack();
+          if (options.display_grid) {
+            for (var j = 0; j <= 1; j++) {
+              var t = (j === 1 ? offset_y + (y_spacing / 2) : offset_y);
+              this.path(["M", offset_x, t, "H", options.width - 5]).attr({'stroke': options.grid_color}).toBack();
 
-            if (display === 1 && j === 1) {
-              this.path(["M", offset_x, offset_y - (y_spacing / 2), "H", options.width - 5]).attr({'stroke': options.grid_color}).toBack();
+              if (display === 1 && j === 1) {
+                this.path(["M", offset_x, offset_y - (y_spacing / 2), "H", options.width - 5]).attr({'stroke': options.grid_color}).toBack();
+              }
             }
           }
 
