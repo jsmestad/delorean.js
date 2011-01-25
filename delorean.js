@@ -52,13 +52,13 @@
       window.console && console.log(Array.prototype.slice.call(arguments));
     }
 
-    function parseDate(d) {
-      d = new Date(d);
+    function parseDate(date) {
+      d = new Date(date);
 
       if (isNaN(d)) {
         log('ISO 8601 Date constructor not supported.');
         d = new Date();
-        d.setISO8601(d);
+        d.setISO8601(date);
       }
 
       return d;
