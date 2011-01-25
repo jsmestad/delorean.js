@@ -35,7 +35,7 @@ get '/stats' do
 
   stats = {}
   random = Random.new
-  sequence_length.downto(0) do |i|
+  sequence_length.downto(1) do |i|
     if params[:multi_line].present?
       value_array = []
       params[:multi_line].to_i.times { |i| value_array << random.rand(1...1000000) }
