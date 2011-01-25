@@ -73,6 +73,34 @@
       }
     }
 
+    function tooltip(ev) {
+      if (!$('#tooltip').length) {
+        $('body').append('<div id="tooltip"><div id="tooltip_inner">HELLO WORLD<br />HELLO WORLD<br />HELLO WORLD<br />HELLO WORLD<br />HELLO WORLD<br /></div></div>');
+      }
+
+      var svg = $(ev.target.parentNode);
+      var svg_x = svg.offset().left + svg.outerWidth();
+      var svg_y = svg.offset().top + svg.outerHeight();
+
+      // Alias tooltip.
+      var tt = $('#tooltip').show();
+    	var tt_i = $('#tooltip_inner');
+
+      // Event coordinates.
+  		var ev_x = ev.pageX;
+  		var ev_y = ev.pageY;
+
+  		// Tooltip coordinates.
+  		var tt_x = tt.outerWidth();
+  		var tt_y = tt.outerHeight();
+
+  		// Move tooltip.
+      tt.css({
+  			'top': ev_y + tt_y > svg_y ? ev_y - tt_y : ev_y,
+  			'left': ev_x + tt_x + 20 > svg_x ? ev_x - tt_x - 15 : ev_x + 20
+  		});
+    }
+
     // This draws the X Axis (the dates).
     Raphael.fn.drawXAxis = function(dates, X) {
       var x, date;
@@ -204,7 +232,7 @@
           'opacity': 0
         }));
 
-        (function(rect, points, x) {
+        (function(rect, points, x, y, value) {
           rect.hover(function() {
             _.each(points[x], function(point) {
               point.attr({
@@ -218,8 +246,12 @@
                 'r': point_size
               });
             });
+
+            $('#tooltip').hide();
+          }).mousemove(function(ev) {
+            tooltip(ev);
           });
-        })(layer[layer.length - 1], point_array, x);
+        })(layer[layer.length - 1], point_array, x, y, value);
       }
     };
 
