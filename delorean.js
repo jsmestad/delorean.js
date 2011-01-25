@@ -64,18 +64,18 @@
     function displayValue(value, precision) {
       if (value >= 0 && value < 1000) {
         return value.toString();
-      }
-      else if (value >= 1000 && value < 1000000) {
+      } else if (value >= 1000 && value < 1000000) {
         return (value / 1000).toFixed(precision) + 'K';
-      }
-      else if (value >= 1000000) {
+      } else if (value >= 1000000) {
         return (value / 1000000).toFixed(precision) + 'M';
       }
     }
 
-    function tooltip(event) {
+    function tooltip(event, values) {
       if (!$('#tooltip').length) {
-        $('body').append('<div id="tooltip"><div id="tooltip_inner">HELLO WORLD<br />HELLO WORLD<br />HELLO WORLD<br />HELLO WORLD<br />HELLO WORLD<br /></div></div>');
+        $('body').append('<div id="tooltip"><div id="tooltip_inner">' + values.join('<br />') + '</div></div>');
+      } else {
+        $('#tooltip_inner').html(values.join('<br />'));
       }
 
       var svg = $(event.target.parentNode);
@@ -96,8 +96,8 @@
 
   		// Move tooltip.
       tooltip.css({
-  			'top': event_y + tooltip_y > svg_y ? event_y - tooltip_y : event_y,
-  			'left': event_x + tooltip_x + 20 > svg_x ? event_x - tooltip_x - 15 : event_x + 20
+  			'top': (event_y + tooltip_y > svg_y) ? event_y - tooltip_y : event_y,
+  			'left': (event_x + tooltip_x + 20 > svg_x) ? event_x - tooltip_x - 15 : event_x + 20
   		});
     }
 
@@ -112,11 +112,9 @@
       while (i--) {
         if (i === 0 && dates_length < 20) {
           x = -10;
-        }
-        else if (dates_length > 60 && i === 1) {
+        } else if (dates_length > 60 && i === 1) {
           x = Math.round(X * i) + 5;
-        }
-        else {
+        } else {
           x = Math.round(X * i);
         }
 
@@ -173,6 +171,7 @@
 
       var layer = this.set();
       var point_array = [];
+      var values_array = [];
       var tooltip_visible = false;
       var leave_timer = null;
       var dates_length = dates.length;
@@ -181,6 +180,8 @@
         var x = Math.round(X * i);
 
         point_array[x] = [];
+        values_array[x] = [];
+
 
         var stroke_color = '#fff';
         var point_size = options.point_size;
@@ -190,8 +191,7 @@
         if (dates_length > 45 && dates_length <= 90) {
           point_size = 3;
           point_size_hover = 5;
-        }
-        else if (dates_length > 90) {
+        } else if (dates_length > 90) {
           point_size = 0;
           point_size_hover = 3;
         }
@@ -206,8 +206,7 @@
 
           if (dates_length < 45) {
             line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 10);
-          }
-          else {
+          } else {
             line_paths[j][(first_point ? 'moveTo' : 'lineTo')](x, y, 10);
           }
 
@@ -218,6 +217,7 @@
 
           point.insertAfter(line_paths[j]);
           point_array[x].push(point);
+          values_array[x].push(value);
         }
 
         layer.push(this.rect(X * i, 0, X, options.height - margin_bottom).attr({
@@ -226,7 +226,7 @@
           'opacity': 0
         }));
 
-        (function(rect, points, x, y, value) {
+        (function(rect, points, x, values) {
           rect.hover(function() {
             _.each(points[x], function(point) {
               point.attr({
@@ -243,9 +243,10 @@
 
             $('#tooltip').hide();
           }).mousemove(function(event) {
-            tooltip(event);
+            log(values[x]);
+            tooltip(event, values[x]);
           });
-        })(layer[layer.length - 1], point_array, x, y, value);
+        })(layer[layer.length - 1], point_array, x, values_array);
       }
     };
 
@@ -271,8 +272,7 @@
 
         if (_.isArray(values[0])) {
           max = _(_(values).flatten()).max();
-        }
-        else {
+        } else {
           max = _(values).max();
 
           _.each(data, function(value, key) {
