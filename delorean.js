@@ -73,31 +73,31 @@
       }
     }
 
-    function tooltip(ev) {
+    function tooltip(event) {
       if (!$('#tooltip').length) {
         $('body').append('<div id="tooltip"><div id="tooltip_inner">HELLO WORLD<br />HELLO WORLD<br />HELLO WORLD<br />HELLO WORLD<br />HELLO WORLD<br /></div></div>');
       }
 
-      var svg = $(ev.target.parentNode);
+      var svg = $(event.target.parentNode);
       var svg_x = svg.offset().left + svg.outerWidth();
       var svg_y = svg.offset().top + svg.outerHeight();
 
       // Alias tooltip.
-      var tt = $('#tooltip').show();
-    	var tt_i = $('#tooltip_inner');
+      var tooltip = $('#tooltip').show();
+    	var tooltip_inner = $('#tooltip_inner');
 
       // Event coordinates.
-  		var ev_x = ev.pageX;
-  		var ev_y = ev.pageY;
+  		var event_x = event.pageX;
+  		var event_y = event.pageY;
 
   		// Tooltip coordinates.
-  		var tt_x = tt.outerWidth();
-  		var tt_y = tt.outerHeight();
+  		var tooltip_x = tooltip.outerWidth();
+  		var tooltip_y = tooltip.outerHeight();
 
   		// Move tooltip.
-      tt.css({
-  			'top': ev_y + tt_y > svg_y ? ev_y - tt_y : ev_y,
-  			'left': ev_x + tt_x + 20 > svg_x ? ev_x - tt_x - 15 : ev_x + 20
+      tooltip.css({
+  			'top': event_y + tooltip_y > svg_y ? event_y - tooltip_y : event_y,
+  			'left': event_x + tooltip_x + 20 > svg_x ? event_x - tooltip_x - 15 : event_x + 20
   		});
     }
 
@@ -248,8 +248,8 @@
             });
 
             $('#tooltip').hide();
-          }).mousemove(function(ev) {
-            tooltip(ev);
+          }).mousemove(function(event) {
+            tooltip(event);
           });
         })(layer[layer.length - 1], point_array, x, y, value);
       }
