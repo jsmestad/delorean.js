@@ -205,10 +205,12 @@
             y = Math.round(options.height - margin_bottom - Y * 0);
           }
 
-          if (dates_length < 45) {
+          if (dates_length <= 45) {
             line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 10);
+          } else if (dates_length <= 90) {
+            line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 4);
           } else {
-            line_paths[j][(first_point ? 'moveTo' : 'lineTo')](x, y, 10);
+            line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 1);
           }
 
           var point = this.circle(x, y, point_size).attr({
