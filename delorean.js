@@ -11,7 +11,7 @@
   // Constructor.
   var Delorean = function(options) {
     // Empty vars.
-    var chart, data;
+    var chart, data, r;
 
     // Defaults.
     options = {
@@ -40,7 +40,8 @@
         'font-family': 'Arial, san-serif'
       },
       grid_color: '#f5f5f5',
-      display_grid: true,
+      display_x_grid: true,
+      display_y_grid: true,
       stroke_width: 4,
       stroke_width_dense: 2,
       point_size: 5,
@@ -64,6 +65,15 @@
       return d;
     }
 
+    function calculateLabelWidth(date) {
+      d = parseDate(date).strftime(options.date_format);
+      var texty = r.text(0, 0, d).attr(options.text_date);
+      // TODO: 22.5 should be configurable (this is currently purely for styling)
+      var label_width = Math.round(texty.getBBox().width + 22.5);
+      texty.remove();
+      return label_width;
+    }
+
     function displayValue(value, precision) {
       if (value >= 0 && value < 1000) {
         return value.toString();
@@ -85,7 +95,7 @@
       var svg_x = svg.offset().left + svg.outerWidth();
       var svg_y = svg.offset().top + svg.outerHeight();
 
-      // Alias tooltip.
+      // Alias tool tip.
       var tooltip = $('#tooltip').show();
     	var tooltip_inner = $('#tooltip_inner');
 
@@ -93,11 +103,11 @@
   		var event_x = event.pageX;
   		var event_y = event.pageY;
 
-  		// Tooltip coordinates.
+  		// Tool tip coordinates.
   		var tooltip_x = tooltip.outerWidth();
   		var tooltip_y = tooltip.outerHeight();
 
-  		// Move tooltip.
+  		// Move tool tip.
       tooltip.css({
   			'top': (event_y + tooltip_y > svg_y) ? event_y - (tooltip_y / 2) : event_y,
   			'left': (event_x + tooltip_x + 20 > svg_x) ? event_x - tooltip_x - 15 : event_x + 20
@@ -106,27 +116,31 @@
 
     // This draws the X Axis (the dates).
     Raphael.fn.drawXAxis = function(dates, X) {
-      var x, date;
+      var x, date, date_labels, i;
       var dates_length = dates.length;
       var num_to_skip = Math.round(dates_length / 11);
       var y_position = options.height - 8;
-      var i = dates_length;
+      var label_width = calculateLabelWidth(dates[0]);
+      var total_possible = Math.round(options.width / label_width);
+      var every_x = Math.round(dates_length / total_possible);
+
+      if (every_x === 0) { 
+        date_labels = dates;
+      } else {
+        date_labels = _.select(dates, function(d, index) { return (index % every_x === 0) });
+      }
+
+      i = date_labels.length;
 
       while (i--) {
-        x = Math.round(X * i);
-        if (i === 0 && dates_length < 20) {
-          x = -10;
-        } else if (i === 1 && dates_length > 60) {
-          x += 5;
+        x = Math.round(X * _.indexOf(dates, date_labels[i], true)) + (options.label_offset + 15);
+        date = parseDate(date_labels[i]).strftime(options.date_format);
+        this.text(x, y_position, date).attr(options.text_date).toBack();
+
+        if (options.display_x_grid) {
+          this.path(["M", x, y_position, "V", 0]).attr({'stroke': options.grid_color}).toBack();
         }
 
-        if ((dates_length < 20) || (i !== 0 && i % num_to_skip === 1)) {
-          date = parseDate(dates[i]).strftime(options.date_format);
-          this.text(x, y_position, date).attr({
-            'font-size': '10px',
-            'fill': '#afafaf'
-          }).toBack();
-        }
       }
     };
 
@@ -144,12 +158,17 @@
       for (var scale = 0; scale < max_more; scale += max_less) {
         if (display >= 1 && scale > 0) {
 
-          if (options.display_grid) {
+          if (options.display_y_grid) {
             for (var j = 0; j <= 1; j++) {
               var t = (j === 1 ? offset_y + (y_spacing / 2) : offset_y);
               this.path(["M", offset_x, t, "H", options.width - 5]).attr({'stroke': options.grid_color}).toBack();
 
               if (display === 1 && j === 1) {
+                /*
+                * TODO: There should be a better way to draw this last line.
+                *       The math here draws a line above itself and on the display line.
+                *       This kills the outlier.
+                */
                 this.path(["M", offset_x, offset_y - (y_spacing / 2), "H", options.width - 5]).attr({'stroke': options.grid_color}).toBack();
               }
             }
@@ -191,11 +210,10 @@
       var dates_length = dates.length;
 
       for (var i = 0; i < dates_length; i++) {
-        var x = Math.round(X * i);
+        var x = Math.round(X * i) + (options.label_offset + 15);
 
         point_array[x] = [];
         values_array[x] = [];
-
 
         var stroke_color = '#fff';
         var point_size = options.point_size;
@@ -236,7 +254,7 @@
           values_array[x].push(value);
         }
 
-        layer.push(this.rect(X * i, 0, X, options.height - margin_bottom).attr({
+        layer.push(this.rect(x, 0, X, options.height - margin_bottom).attr({
           'stroke': 'none',
           'fill': '#fff',
           'opacity': 0
@@ -279,10 +297,11 @@
         while (i--) {
           data[i] = parseDate(data[i]);
         }
+
+        r = Raphael(chart.get(0), options.width, options.height);
       },
       render: function() {
         var max;
-        var r = Raphael(chart.get(0), options.width, options.height);
         var dates = _(data).keys();
         var values = _(data).values();
 
@@ -296,7 +315,7 @@
           });
         }
 
-        var X = options.width / dates.length;
+        var X = (options.width - (options.label_offset + 15)) / dates.length;
         var Y = (options.height - options.margin_bottom - options.margin_top) / max;
 
         r.drawXAxis(dates, X);
