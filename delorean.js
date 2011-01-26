@@ -110,23 +110,57 @@
       var dates_length = dates.length;
       var num_to_skip = Math.round(dates_length / 11);
       var y_position = options.height - 8;
-      var i = dates_length;
+      // var i = dates_length;
+
+      // Calculate label size
+      date = parseDate(dates[0]).strftime(options.date_format);
+      var texty = this.text(-50, y_position, date).attr(options.text_date);
+      var label_width = Math.round(texty.getBBox().width + 22.5);
+      texty.remove();
+
+      log('label width', label_width);
+
+      var total_possible = Math.round(options.width / label_width);
+
+      log('total_possible', total_possible);
+
+      // num_to_skip = total_possible >= dates_length ? 0 : dates_length / total_possible
+      log('every x', Math.round(dates_length / total_possible));
+      var every_x = Math.round(dates_length / total_possible);
+
+
+      var map;
+      if (every_x === 0) { 
+        map = dates;
+      } else {
+        map = _.select(dates, function(d, index) { return (index % every_x === 0) });
+      }
+
+      log('nth values', map);
+
+      var i = map.length;
 
       while (i--) {
-        x = Math.round(X * i);
-        if (i === 0 && dates_length < 20) {
-          x = -10;
-        } else if (i === 1 && dates_length > 60) {
-          x += 5;
-        }
 
-        if ((dates_length < 20) || (i !== 0 && i % num_to_skip === 1)) {
-          date = parseDate(dates[i]).strftime(options.date_format);
-          this.text(x, y_position, date).attr({
-            'font-size': '10px',
-            'fill': '#afafaf'
-          }).toBack();
-        }
+        x = Math.round(X * _.indexOf(dates, map[i], true)) + (options.label_offset + 15);;
+        //log('num_to_skip', X, i, x, num_to_skip, i % num_to_skip);
+        // if (dates_length < 20) {
+          // x += options.label_offset;
+        // }
+
+        // if (i === 0 && dates_length < 20) {
+          // x = -10;
+        // } else if (i === 1 && dates_length > 60) {
+          // x += 5;
+        // }
+
+
+        // if ((dates_length < 20) || (i !== 0 && i % num_to_skip === 1)) {
+          // if (x+26 <= options.width) {
+            date = parseDate(map[i]).strftime(options.date_format);
+            this.text(x, y_position, date).attr(options.text_date).toBack();
+          // }
+        // }
       }
     };
 
@@ -191,11 +225,10 @@
       var dates_length = dates.length;
 
       for (var i = 0; i < dates_length; i++) {
-        var x = Math.round(X * i);
+        var x = Math.round(X * i) + (options.label_offset + 15);
 
         point_array[x] = [];
         values_array[x] = [];
-
 
         var stroke_color = '#fff';
         var point_size = options.point_size;
@@ -236,7 +269,7 @@
           values_array[x].push(value);
         }
 
-        layer.push(this.rect(X * i, 0, X, options.height - margin_bottom).attr({
+        layer.push(this.rect(x, 0, X, options.height - margin_bottom).attr({
           'stroke': 'none',
           'fill': '#fff',
           'opacity': 0
@@ -296,8 +329,9 @@
           });
         }
 
-        var X = options.width / dates.length;
+        var X = (options.width - (options.label_offset + 15)) / dates.length;
         var Y = (options.height - options.margin_bottom - options.margin_top) / max;
+        log('X', X);
 
         r.drawXAxis(dates, X);
         r.drawChart(X, Y);
