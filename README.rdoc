@@ -92,6 +92,11 @@ Multiple Lines:
     ....
   }
 
+To associate names you just need to set the line_labels options:
+
+  $.delorean('#chart', {...data...}, {line_labels: ['Reads','Writes']});
+
+
 == Note on Patches/Pull Requests
  
 * Fork the project.

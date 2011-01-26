@@ -23,6 +23,7 @@
         '#cb4b4b',
         '#9440ed'
       ],
+      line_labels: [],
       date_format: '%m/%d',
       width: 700,
       height: 200,
