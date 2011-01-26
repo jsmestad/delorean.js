@@ -85,6 +85,10 @@
       }
     }
 
+    function calculateOutliers(values) {
+
+    }
+
     function tooltip(event, values) {
       if (!$('#tooltip').length) {
         $('body').append('<div id="tooltip"><div id="tooltip_inner">' + values.join('<br />') + '</div></div>');
@@ -318,6 +322,8 @@
 
         var X = (options.width - (options.label_offset + 15)) / dates.length;
         var Y = (options.height - options.margin_bottom - options.margin_top) / max;
+
+        calculateOutliers(values);
 
         r.drawXAxis(dates, X);
         r.drawChart(X, Y);
