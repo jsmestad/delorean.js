@@ -97,21 +97,21 @@
 
       // Alias tool tip.
       var tooltip = $('#tooltip').show();
-    	var tooltip_inner = $('#tooltip_inner');
+      var tooltip_inner = $('#tooltip_inner');
 
       // Event coordinates.
-  		var event_x = event.pageX;
-  		var event_y = event.pageY;
+      var event_x = event.pageX;
+      var event_y = event.pageY;
 
-  		// Tool tip coordinates.
-  		var tooltip_x = tooltip.outerWidth();
-  		var tooltip_y = tooltip.outerHeight();
+      // Tool tip coordinates.
+      var tooltip_x = tooltip.outerWidth();
+      var tooltip_y = tooltip.outerHeight();
 
-  		// Move tool tip.
+      // Move tool tip.
       tooltip.css({
-  			'top': (event_y + tooltip_y > svg_y) ? event_y - (tooltip_y / 2) : event_y,
-  			'left': (event_x + tooltip_x + 20 > svg_x) ? event_x - tooltip_x - 15 : event_x + 20
-  		});
+        'top': (event_y + tooltip_y > svg_y) ? event_y - (tooltip_y / 2) : event_y,
+        'left': (event_x + tooltip_x + 20 > svg_x) ? event_x - tooltip_x - 15 : event_x + 20
+      });
     };
 
     // This draws the X Axis (the dates).
