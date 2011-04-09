@@ -291,7 +291,7 @@
 
         chart = $(target_);
         chart.children().remove();
-        data = data_;
+        data = _.clone(data_);
 
         var i = data.length;
 
