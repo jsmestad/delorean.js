@@ -5,6 +5,7 @@ require 'haml'
 require 'json'
 
 require 'i18n'
+require 'active_support/json'
 require 'active_support/all'
 
 set :app_file, __FILE__

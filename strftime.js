@@ -1,36 +1,56 @@
 // Written by Gianni Chiappetta - gianni[at]runlevel6[dot]org
 // Released under the WTFPL
 
-Date.prototype.setISO8601 = function(string) {
-  var regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" +
-      "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?" +
-      "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
-  var d = string.match(new RegExp(regexp));
+if (_.isUndefined(Date.prototype.setISO8601)) {
+  Date.prototype.setISO8601 = function(string) {
+    var regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" +
+        "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?" +
+        "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
+    var d = string.match(new RegExp(regexp));
 
-  var offset = 0;
-  var date = new Date(d[1], 0, 1);
+    var offset = 0;
+    var date = new Date(d[1], 0, 1);
 
-  if (d[3]) { date.setMonth(d[3] - 1); }
-  if (d[5]) { date.setDate(d[5]); }
-  if (d[7]) { date.setHours(d[7]); }
-  if (d[8]) { date.setMinutes(d[8]); }
-  if (d[10]) { date.setSeconds(d[10]); }
-  if (d[12]) { date.setMilliseconds(Number("0." + d[12]) * 1000); }
-  if (d[14]) {
-      offset = (Number(d[16]) * 60) + Number(d[17]);
-      offset *= ((d[15] == '-') ? 1 : -1);
+    if (d[3]) { date.setMonth(d[3] - 1); }
+    if (d[5]) { date.setDate(d[5]); }
+    if (d[7]) { date.setHours(d[7]); }
+    if (d[8]) { date.setMinutes(d[8]); }
+    if (d[10]) { date.setSeconds(d[10]); }
+    if (d[12]) { date.setMilliseconds(Number("0." + d[12]) * 1000); }
+    if (d[14]) {
+        offset = (Number(d[16]) * 60) + Number(d[17]);
+        offset *= ((d[15] == '-') ? 1 : -1);
+    }
+
+    offset -= date.getTimezoneOffset();
+    time = (Number(date) + (offset * 60 * 1000));
+    this.setTime(Number(time));
   }
-
-  offset -= date.getTimezoneOffset();
-  time = (Number(date) + (offset * 60 * 1000));
-  this.setTime(Number(time));
 }
 
-if (typeof Date.prototype.strftime == 'undefined') {
+if (_.isUndefined(Date.prototype.toISOString)) {
+  Date.prototype.toISOString() = function() {
+    return this.getUTCFullYear() + '-' +
+      (this.getUTCMonth() + 1).toPaddedString(2) + '-' +
+      this.getUTCDate().toPaddedString(2) + 'T' +
+      this.getUTCHours().toPaddedString(2) + ':' +
+      this.getUTCMinutes().toPaddedString(2) + ':' +
+      this.getUTCSeconds().toPaddedString(2) + 'Z';
+  }
+}
+
+if (_.isUndefined(Number.prototype.toPaddedString)) {
+  Number.prototype.toPaddedString = function toPaddedString(length, radix) {
+    var string = this.toString(radix || 10);
+    return '0'.times(length - string.length) + string;
+  }
+}
+
+if (_.isUndefined(Date.prototype.strftime)) {
   /**
    * Date#strftime(format) -> String
    * - format (String): Formats time according to the directives in the given format string. Any text not listed as a directive will be passed through to the output string.
-   * 
+   *
    * Ruby-style date formatting. Format matchers:
    *
    * %a - The abbreviated weekday name (``Sun'')
@@ -68,7 +88,7 @@ if (typeof Date.prototype.strftime == 'undefined') {
    * http://www.ruby-doc.org/core/classes/Time.html#M000298
    *
    **/
-  
+
   Date.prototype.strftime = (function(){
     var cache = {'start_of_year': new Date("Jan 1 " + (new Date()).getFullYear())},
         regexp = /%([a-z]|%)/mig,
@@ -106,147 +126,147 @@ if (typeof Date.prototype.strftime == 'undefined') {
           'z': time_zone_offset,
           '%': function() { return '%'; }
         };
-    
+
     // day
     function day(date) {
       return date.getDate() + '';
     }
-    
+
     // day_of_week
     function day_of_week(date) {
       return date.getDay() + '';
     }
-    
+
     // day_of_year
     function day_of_year(date) {
       return (((date.getTime() - cache['start_of_year'].getTime()) / day_in_ms + 1) + '').split(/\./)[0];
     }
-    
+
     // day_padded
     function day_padded(date) {
       return ('0' + day(date)).slice(-2);
     }
-    
+
     // default_local
     function default_local(date) {
       return date.toLocaleString();
     }
-    
+
     // default_local_date
     function default_local_date(date) {
       return date.toLocaleDateString();
     }
-    
+
     // default_local_time
     function default_local_time(date) {
       return date.toLocaleTimeString();
     }
-    
+
     // hour
     function hour(date) {
       var hour = date.getHours();
-      
+
       if (hour === 0) hour = 12;
       else if (hour > 12) hour -= 12;
-      
+
       return hour + '';
     }
-    
+
     // hour_24
     function hour_24(date) {
       return date.getHours();
     }
-    
+
     // hour_24_padded
     function hour_24_padded(date) {
       return ('0' + hour_24(date)).slice(-2);
     }
-    
+
     // hour_padded
     function hour_padded(date) {
       return ('0' + hour(date)).slice(-2);
     }
-    
+
     // meridian
     function meridian(date) {
       return date.getHours() >= 12 ? 'pm' : 'am';
     }
-    
+
     // meridian_upcase
     function meridian_upcase(date) {
       return meridian(date).toUpperCase();
     }
-    
+
     // minute
     function minute(date) {
       return ('0' + date.getMinutes()).slice(-2);
     }
-    
+
     // month
     function month(date) {
       return ('0'+(date.getMonth()+1)).slice(-2);
     }
-    
+
     // month_name
     function month_name(date) {
       return months[date.getMonth()];
     }
-    
+
     // month_name_abbr
     function month_name_abbr(date) {
       return abbr_months[date.getMonth()];
     }
-    
+
     // second
     function second(date) {
       return ('0' + date.getSeconds()).slice(-2);
     }
-    
+
     // time_zone_offset
     function time_zone_offset(date) {
       var tz_offset = date.getTimezoneOffset();
       return (tz_offset >= 0 ? '-' : '') + ('0' + (tz_offset / 60)).slice(-2) + ':' + ('0' + (tz_offset % 60)).slice(-2);
     }
-    
+
     // week_number_from_sunday
     function week_number_from_sunday(date) {
       return ('0' + Math.round(parseInt(day_of_year(date), 10) / 7)).slice(-2);
     }
-    
+
     // weekday_name
     function weekday_name(date) {
       return days[date.getDay()];
     }
-    
+
     // weekday_name_abbr
     function weekday_name_abbr(date) {
       return abbr_days[date.getDay()];
     }
-    
+
     // year
     function year(date) {
       return date.getFullYear() + '';
     }
-    
+
     // year_abbr
     function year_abbr(date) {
       return year(date).slice(-2);
     }
-    
+
     /*------------------------------ Main ------------------------------*/
     function strftime(format) {
       var match, output = format;
       cache['start_of_year'] = new Date("Jan 1 " + this.getFullYear());
-      
+
       while (match = regexp.exec(format)) {
         if (match[1] in formats) {
           output = output.replace(new RegExp(match[0], 'mg'), formats[match[1]](this));
         }
       }
-      
+
       return output;
     }
-    
+
     return strftime;
   })();
 }

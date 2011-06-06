@@ -11,7 +11,7 @@
   // Constructor.
   var Delorean = function(options) {
     // Empty vars.
-    var chart, data, r;
+    var chart, raw_data, data, r;
 
     // Defaults.
     options = {
@@ -40,6 +40,7 @@
         'font-size': '13px',
         'font-family': 'Arial, san-serif'
       },
+      trend: false,
       grid_color: '#f5f5f5',
       display_x_grid: true,
       display_y_grid: true,
@@ -47,22 +48,77 @@
       stroke_width_dense: 2,
       point_size: 5,
       point_size_hover: 7,
-      enable_tooltips: false
+      enable_tooltips: false,
+      verify_libraries: true
     };
 
     function log() {
       window.console && console.log(Array.prototype.slice.call(arguments));
     }
 
+    function mean(numbers) {
+      // mean of [3, 5, 4, 4, 1, 1, 2, 3] is 2.875
+      var total = 0;
+      var i;
+      for (i = 0; i < numbers.length; i += 1) {
+        total += numbers[i];
+      }
+      return total / numbers.length;
+    }
+
+    function median(numbers) {
+      // median of [3, 5, 4, 4, 1, 1, 2, 3] = 3
+      var median = 0;
+      var numsLen = numbers.length;
+      numbers.sort();
+      if (numsLen % 2 === 0) { // is even
+        // average of two middle numbers
+        median = (numbers[numsLen / 2 - 1] + numbers[numsLen / 2]) / 2;
+      } else { // is odd
+        // middle number only
+        median = numbers[(numsLen - 1) / 2];
+      }
+      return median;
+    }
+
+    function mode(numbers) {
+      // as result can be bimodal or multimodal,
+      // the returned result is provided as an array
+      // mode of [3, 5, 4, 4, 1, 1, 2, 3] = [1, 3, 4]
+      var modes = [],
+          count = [],
+          i,
+          number,
+          maxIndex = 0;
+      for (i = 0; i < numbers.length; i += 1) {
+        number = numbers[i];
+        count[number] = (count[number] || 0) + 1;
+        if (count[number] > maxIndex) {
+          maxIndex = count[number];
+        }
+      }
+      for (i in count) if (count.hasOwnProperty(i)) {
+        if (count[i] === maxIndex) {
+          modes.push(Number(i));
+        }
+      }
+      return modes;
+    }
+
+    function range(numbers) {
+      // range of [3, 5, 4, 4, 1, 1, 2, 3] is [1, 5]
+      numbers.sort();
+      return [numbers[0], numbers[numbers.length - 1]];
+    }
+
     function parseDate(date) {
-      d = new Date(date);
+      d = _.isDate(date) ? date : new Date(date);
 
       if (isNaN(d)) {
-        log('ISO 8601 Date constructor not supported.');
+        log('ISO 8601 Date constructor not supported in this browser.');
         d = new Date();
         d.setISO8601(date);
       }
-
       return d;
     }
 
@@ -115,6 +171,42 @@
       });
     };
 
+    function distillData(data, force) {
+      if (_.isNull(distilled_data) || force === true) {
+        var distilled_data = {};
+        var tmp_data = _.clone(data);
+        var dates = _(tmp_data).keys();
+        var max_points = Math.round(options.width / 17);
+        var every_x = Math.round(dates.length / max_points);
+        var date_groups = [];
+        var normalized_data = {};
+
+        _(max_points-1).times(function(i) {
+          date_groups[i] = dates.splice(0, every_x);
+        });
+
+        _.each(date_groups, function(date_group) {
+          var values = _.map(date_group, function(d){ return tmp_data[d] });
+          if (_.isArray(values[0])) {
+            var avg = []
+            _(values[0].length).times(function(i) {
+              var set = _.map(values, function(v){ return v[i] });
+              avg.push(Math.round(_(set).reduce(function(sum,n){ return sum + n },0) / set.length));
+            });
+          } else {
+            var avg = Math.round(_(values).reduce(function(sum,n){ return sum + n },0) / values.length);
+          }
+          var display_date = _.map(date_group, function(d){ return parseDate(d) });
+          var starting_date = _(display_date).chain()
+            .sort(function(a,b){ if (a > b) return 1; if (a < b) return -1; return 0; })
+            .head()
+            .value();
+          distilled_data[starting_date.toISOString()] = avg;
+        });
+      }
+      return distilled_data;
+    }
+
     // This draws the X Axis (the dates).
     Raphael.fn.drawXAxis = function(dates, X) {
       var x, date, date_labels, i;
@@ -125,7 +217,7 @@
       var total_possible = Math.round(options.width / label_width);
       var every_x = Math.round(dates_length / total_possible);
 
-      if (every_x === 0) { 
+      if (every_x === 0) {
         date_labels = dates;
       } else {
         date_labels = _.select(dates, function(d, index) { return (index % every_x === 0) });
@@ -288,18 +380,23 @@
     return {
       init: function(target_, data_, options_) {
         $.extend(true, options, options_);
+        raw_data = _.clone(data_);
+        data = options.trend == true ? distillData(raw_data, true) : raw_data;
+
+        if (options.verify_libraries) {
+          if (_.isUndefined(Date.prototype.strftime) || _.isUndefined(Date.prototype.setISO8601)) { throw "You must include the strftime.js file before executing Delorean.js" }
+          if (_.isUndefined(Raphael)) { throw "You must include the raphael.js file before executing Delorean.js" }
+          if (_.isUndefined(Raphael.el.lineTo)) { throw "You must include the raphael.path.methods.js file before executing Delorean.js" }
+        }
 
         chart = $(target_);
         chart.children().remove();
-        data = _.clone(data_);
 
-        var i = data.length;
-
-        while (i--) {
-          data[i] = parseDate(data[i]);
-        }
 
         r = Raphael(chart.get(0), options.width, options.height);
+      },
+      distill: function(force) {
+        distillData(force);
       },
       render: function() {
         var max;
@@ -310,10 +407,7 @@
           max = _(_(values).flatten()).max();
         } else {
           max = _(values).max();
-
-          _.each(data, function(value, key) {
-            data[key] = [value];
-          });
+          _.each(data, function(value, key) { data[key] = [value] });
         }
 
         var X = (options.width - (options.label_offset + 15)) / dates.length;

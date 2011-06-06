@@ -24,10 +24,12 @@
       });
     }
 
-    if ($('#semiannual_chart').length) {
+    if ($('#semiannual_chart, #semiannual_trend_chart').length) {
       $.getJSON('/stats?sequence_length=180', function(stats) {
         var chart = $.delorean('#semiannual_chart', stats, {width: 780});
         chart.render();
+        var trend_chart = $.delorean('#semiannual_trend_chart', stats, {width: 780, trend: true});
+        trend_chart.render();
       });
     }
 
@@ -53,15 +55,17 @@
       });
     }
 
-    if ($('#multi_semiannual_chart').length) {
+    if ($('#multi_semiannual_chart, #multi_semiannual_trend_chart').length) {
       $.getJSON('/stats?sequence_length=180&multi_line=2', function(stats) {
         var chart = $.delorean('#multi_semiannual_chart', stats, {width: 780});
         chart.render();
+        var trend_chart = $.delorean('#multi_semiannual_trend_chart', stats, {width: 780, trend: true});
+        trend_chart.render();
       });
     }
 
   });
-  
+
 })(jQuery);
 
 // usage: log('inside coolFunc',this,arguments);
