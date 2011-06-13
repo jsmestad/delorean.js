@@ -177,18 +177,19 @@
         var tmp_data = _.clone(data);
         var dates = _(tmp_data).keys();
         var max_points = Math.round(options.width / 17);
-        var every_x = Math.round(dates.length / max_points);
+        var every_x = (dates.length >= max_points) ?  Math.round(dates.length / max_points) : 1;
         var date_groups = [];
         var normalized_data = {};
 
-        _(max_points-1).times(function(i) {
+        var point_num = (every_x == 1) ? dates.length : max_points - 1;
+        _(point_num).times(function(i) {
           date_groups[i] = dates.splice(0, every_x);
         });
 
         _.each(date_groups, function(date_group) {
           var values = _.map(date_group, function(d){ return tmp_data[d] });
           if (_.isArray(values[0])) {
-            var avg = []
+            var avg = [];
             _(values[0].length).times(function(i) {
               var set = _.map(values, function(v){ return v[i] });
               avg.push(Math.round(_(set).reduce(function(sum,n){ return sum + n },0) / set.length));
