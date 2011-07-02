@@ -171,6 +171,28 @@
       });
     };
 
+		function tintColor(color, v) {
+		    if (color.length > 6) { color = color.substring(1,color.length)}
+		    var rgb = [parseInt(color.slice(0,2),16),parseInt(color.slice(2,4),16),parseInt(color.slice(4),16)] 
+				var v = [],i
+				for(i=0;i<3;i++){
+				 v[i]=Math.round(rgb[i]*b)
+				 if(v[i]>255)v[i]=255
+				 if(v[i]<0)v[i]=0
+				}
+				return "#" + v.join('');
+		    var r = Math.abs(((rgb >> 16) & 0xFF)+v); if (r>255) r=r-(r-255);
+		    var g = Math.abs(((rgb >> 8) & 0xFF)+v); if (g>255) g=g-(g-255);
+		    var b = Math.abs((rgb & 0xFF)+v); if (b>255) b=b-(b-255);
+		    r = Number(r < 0 || isNaN(r)) ? 0 : ((r > 255) ? 255 : r).toString(16); 
+		    if (r.length == 1) r = '0' + r;
+		    g = Number(g < 0 || isNaN(g)) ? 0 : ((g > 255) ? 255 : g).toString(16); 
+		    if (g.length == 1) g = '0' + g;
+		    b = Number(b < 0 || isNaN(b)) ? 0 : ((b > 255) ? 255 : b).toString(16); 
+		    if (b.length == 1) b = '0' + b;
+		    return "#" + r + g + b;
+		}
+
     function distillData(data, force) {
       if (_.isNull(distilled_data) || force === true) {
         var distilled_data = {};
@@ -289,8 +311,12 @@
       var stroke_width = dates.length > 45 ? options.stroke_width_dense : options.stroke_width;
 
       for (var k = 0, kk = values[0].length; k < kk; k++) {
+				var c = options.line_colors[k];
+				if (_.isUndefined(c)) {
+		  		c = tintColor(options.line_colors[(options.line_colors.length % k)], Math.round(k / options.line_colors.length))
+				}
         line_paths[k] = this.path().attr({
-          'stroke': options.line_colors[k],
+          'stroke': c,
           'stroke-width': stroke_width,
           'stroke-linejoin': 'round'
         });
