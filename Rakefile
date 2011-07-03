@@ -13,7 +13,7 @@ end
 
 desc "generate documentation"
 task :docs do
-  system "bash -c \"cd src; rocco -o ../docs/ *.coffee\""
+  system "bash -c \"cake docs\""
 end
 
 desc "update github pages"
