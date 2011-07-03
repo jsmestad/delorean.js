@@ -6,3 +6,5 @@ gem 'compass',  '~> 0.10.6'
 
 gem 'i18n', '~> 0.4.2'
 gem 'activesupport', '~> 3.0.7'
+
+gem 'rocco'
