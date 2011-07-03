@@ -21,7 +21,7 @@ task :update_gh_pages => :docs do
   system "cp -r docs __updates__"
   system "git co gh-pages"
   system "cp __updates__/* ."
-  system "mv delorean.js.html index.html"
+  system "mv delorean.html index.html"
   system "rm -rf __updates__"
 end
 

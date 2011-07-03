@@ -1,272 +1,127 @@
-// Written by Gianni Chiappetta - gianni[at]runlevel6[dot]org
-// Released under the WTFPL
+if _.isUndefined(Date::setISO8601)
+  Date::setISO8601 = (string) ->
+    regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" + "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(.([0-9]+))?)?" + "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?"
+    d = string.match(new RegExp(regexp))
+    offset = 0
+    date = new Date(d[1], 0, 1)
+    date.setMonth d[3] - 1  if d[3]
+    date.setDate d[5]  if d[5]
+    date.setHours d[7]  if d[7]
+    date.setMinutes d[8]  if d[8]
+    date.setSeconds d[10]  if d[10]
+    date.setMilliseconds Number("0." + d[12]) * 1000  if d[12]
+    if d[14]
+      offset = (Number(d[16]) * 60) + Number(d[17])
+      offset *= (if (d[15] == "-") then 1 else -1)
+    offset -= date.getTimezoneOffset()
+    time = (Number(date) + (offset * 60 * 1000))
+    @setTime Number(time)
 
-if (_.isUndefined(Date.prototype.setISO8601)) {
-  Date.prototype.setISO8601 = function(string) {
-    var regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" +
-        "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?" +
-        "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
-    var d = string.match(new RegExp(regexp));
+if _.isUndefined(Date::toISOString)
+  Date::toISOString = ->
+    @getUTCFullYear() + "-" + (@getUTCMonth() + 1).toPaddedString(2) + "-" + @getUTCDate().toPaddedString(2) + "T" + @getUTCHours().toPaddedString(2) + ":" + @getUTCMinutes().toPaddedString(2) + ":" + @getUTCSeconds().toPaddedString(2) + "Z"
 
-    var offset = 0;
-    var date = new Date(d[1], 0, 1);
+if _.isUndefined(Number::toPaddedString)
+  Number::toPaddedString = toPaddedString = (length, radix) ->
+    string = @toString(radix or 10)
+    "0".times(length - string.length) + string
 
-    if (d[3]) { date.setMonth(d[3] - 1); }
-    if (d[5]) { date.setDate(d[5]); }
-    if (d[7]) { date.setHours(d[7]); }
-    if (d[8]) { date.setMinutes(d[8]); }
-    if (d[10]) { date.setSeconds(d[10]); }
-    if (d[12]) { date.setMilliseconds(Number("0." + d[12]) * 1000); }
-    if (d[14]) {
-        offset = (Number(d[16]) * 60) + Number(d[17]);
-        offset *= ((d[15] == '-') ? 1 : -1);
-    }
+if _.isUndefined(Date::strftime)
+  Date::strftime = (->
+    day = (date) ->
+      date.getDate() + ""
+    day_of_week = (date) ->
+      date.getDay() + ""
+    day_of_year = (date) ->
+      (((date.getTime() - cache["start_of_year"].getTime()) / day_in_ms + 1) + "").split(/\./)[0]
+    day_padded = (date) ->
+      ("0" + day(date)).slice -2
+    default_local = (date) ->
+      date.toLocaleString()
+    default_local_date = (date) ->
+      date.toLocaleDateString()
+    default_local_time = (date) ->
+      date.toLocaleTimeString()
+    hour = (date) ->
+      hour = date.getHours()
+      if hour == 0
+        hour = 12
+      else hour -= 12  if hour > 12
+      hour + ""
+    hour_24 = (date) ->
+      date.getHours()
+    hour_24_padded = (date) ->
+      ("0" + hour_24(date)).slice -2
+    hour_padded = (date) ->
+      ("0" + hour(date)).slice -2
+    meridian = (date) ->
+      (if date.getHours() >= 12 then "pm" else "am")
+    meridian_upcase = (date) ->
+      meridian(date).toUpperCase()
+    minute = (date) ->
+      ("0" + date.getMinutes()).slice -2
+    month = (date) ->
+      ("0" + (date.getMonth() + 1)).slice -2
+    month_name = (date) ->
+      months[date.getMonth()]
+    month_name_abbr = (date) ->
+      abbr_months[date.getMonth()]
+    second = (date) ->
+      ("0" + date.getSeconds()).slice -2
+    time_zone_offset = (date) ->
+      tz_offset = date.getTimezoneOffset()
+      (if tz_offset >= 0 then "-" else "") + ("0" + (tz_offset / 60)).slice(-2) + ":" + ("0" + (tz_offset % 60)).slice(-2)
+    week_number_from_sunday = (date) ->
+      ("0" + Math.round(parseInt(day_of_year(date), 10) / 7)).slice -2
+    weekday_name = (date) ->
+      days[date.getDay()]
+    weekday_name_abbr = (date) ->
+      abbr_days[date.getDay()]
+    year = (date) ->
+      date.getFullYear() + ""
+    year_abbr = (date) ->
+      year(date).slice -2
+    strftime = (format) ->
+      output = format
+      cache["start_of_year"] = new Date("Jan 1 " + @getFullYear())
+      while match = regexp.exec(format)
+        output = output.replace(new RegExp(match[0], "mg"), formats[match[1]](this))  if match[1] of formats
+      output
+    cache = start_of_year: new Date("Jan 1 " + (new Date()).getFullYear())
+    regexp = /%([a-z]|%)/g
+    day_in_ms = 1000 * 60 * 60 * 24
+    days = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ]
+    months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ]
+    abbr_days = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ]
+    abbr_months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ]
+    formats =
+      a: weekday_name_abbr
+      A: weekday_name
+      b: month_name_abbr
+      B: month_name
+      c: default_local
+      d: day_padded
+      e: day
+      H: hour_24_padded
+      I: hour_padded
+      j: day_of_year
+      k: hour_24
+      l: hour
+      m: month
+      M: minute
+      p: meridian_upcase
+      P: meridian
+      S: second
+      U: week_number_from_sunday
+      w: day_of_week
+      x: default_local_date
+      X: default_local_time
+      y: year_abbr
+      Y: year
+      z: time_zone_offset
+      "%": ->
+        "%"
 
-    offset -= date.getTimezoneOffset();
-    time = (Number(date) + (offset * 60 * 1000));
-    this.setTime(Number(time));
-  }
-}
+    strftime
+  )()
 
-if (_.isUndefined(Date.prototype.toISOString)) {
-  Date.prototype.toISOString() = function() {
-    return this.getUTCFullYear() + '-' +
-      (this.getUTCMonth() + 1).toPaddedString(2) + '-' +
-      this.getUTCDate().toPaddedString(2) + 'T' +
-      this.getUTCHours().toPaddedString(2) + ':' +
-      this.getUTCMinutes().toPaddedString(2) + ':' +
-      this.getUTCSeconds().toPaddedString(2) + 'Z';
-  }
-}
-
-if (_.isUndefined(Number.prototype.toPaddedString)) {
-  Number.prototype.toPaddedString = function toPaddedString(length, radix) {
-    var string = this.toString(radix || 10);
-    return '0'.times(length - string.length) + string;
-  }
-}
-
-if (_.isUndefined(Date.prototype.strftime)) {
-  /**
-   * Date#strftime(format) -> String
-   * - format (String): Formats time according to the directives in the given format string. Any text not listed as a directive will be passed through to the output string.
-   *
-   * Ruby-style date formatting. Format matchers:
-   *
-   * %a - The abbreviated weekday name (``Sun'')
-   * %A - The  full  weekday  name (``Sunday'')
-   * %b - The abbreviated month name (``Jan'')
-   * %B - The  full  month  name (``January'')
-   * %c - The preferred local date and time representation
-   * %d - Day of the month (01..31)
-   * %e - Day of the month without leading zeroes (1..31)
-   * %H - Hour of the day, 24-hour clock (00..23)
-   * %I - Hour of the day, 12-hour clock (01..12)
-   * %j - Day of the year (001..366)
-   * %k - Hour of the day, 24-hour clock w/o leading zeroes (0..23)
-   * %l - Hour of the day, 12-hour clock w/o leading zeroes (1..12)
-   * %m - Month of the year (01..12)
-   * %M - Minute of the hour (00..59)
-   * %p - Meridian indicator (``AM''  or  ``PM'')
-   * %P - Meridian indicator (``am''  or  ``pm'')
-   * %S - Second of the minute (00..60)
-   * %U - Week  number  of the current year,
-   *      starting with the first Sunday as the first
-   *      day of the first week (00..53)
-   * %W - Week  number  of the current year,
-   *      starting with the first Monday as the first
-   *      day of the first week (00..53)
-   * %w - Day of the week (Sunday is 0, 0..6)
-   * %x - Preferred representation for the date alone, no time
-   * %X - Preferred representation for the time alone, no date
-   * %y - Year without a century (00..99)
-   * %Y - Year with century
-   * %Z - Time zone name
-   * %z - Time zone expressed as a UTC offset (``-04:00'')
-   * %% - Literal ``%'' character
-   *
-   * http://www.ruby-doc.org/core/classes/Time.html#M000298
-   *
-   **/
-
-  Date.prototype.strftime = (function(){
-    var cache = {'start_of_year': new Date("Jan 1 " + (new Date()).getFullYear())},
-        regexp = /%([a-z]|%)/mig,
-        day_in_ms = 1000 * 60 * 60 * 24,
-        days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-        months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-        abbr_days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-        abbr_months = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        formats = {
-          'a': weekday_name_abbr,
-          'A': weekday_name,
-          'b': month_name_abbr,
-          'B': month_name,
-          'c': default_local,
-          'd': day_padded,
-          'e': day,
-          'H': hour_24_padded,
-          'I': hour_padded,
-          'j': day_of_year,
-          'k': hour_24,
-          'l': hour,
-          'm': month,
-          'M': minute,
-          'p': meridian_upcase,
-          'P': meridian,
-          'S': second,
-          'U': week_number_from_sunday,
-          // 'W': week_number_from_monday,
-          'w': day_of_week,
-          'x': default_local_date,
-          'X': default_local_time,
-          'y': year_abbr,
-          'Y': year,
-          // 'Z': time_zone_name,
-          'z': time_zone_offset,
-          '%': function() { return '%'; }
-        };
-
-    // day
-    function day(date) {
-      return date.getDate() + '';
-    }
-
-    // day_of_week
-    function day_of_week(date) {
-      return date.getDay() + '';
-    }
-
-    // day_of_year
-    function day_of_year(date) {
-      return (((date.getTime() - cache['start_of_year'].getTime()) / day_in_ms + 1) + '').split(/\./)[0];
-    }
-
-    // day_padded
-    function day_padded(date) {
-      return ('0' + day(date)).slice(-2);
-    }
-
-    // default_local
-    function default_local(date) {
-      return date.toLocaleString();
-    }
-
-    // default_local_date
-    function default_local_date(date) {
-      return date.toLocaleDateString();
-    }
-
-    // default_local_time
-    function default_local_time(date) {
-      return date.toLocaleTimeString();
-    }
-
-    // hour
-    function hour(date) {
-      var hour = date.getHours();
-
-      if (hour === 0) hour = 12;
-      else if (hour > 12) hour -= 12;
-
-      return hour + '';
-    }
-
-    // hour_24
-    function hour_24(date) {
-      return date.getHours();
-    }
-
-    // hour_24_padded
-    function hour_24_padded(date) {
-      return ('0' + hour_24(date)).slice(-2);
-    }
-
-    // hour_padded
-    function hour_padded(date) {
-      return ('0' + hour(date)).slice(-2);
-    }
-
-    // meridian
-    function meridian(date) {
-      return date.getHours() >= 12 ? 'pm' : 'am';
-    }
-
-    // meridian_upcase
-    function meridian_upcase(date) {
-      return meridian(date).toUpperCase();
-    }
-
-    // minute
-    function minute(date) {
-      return ('0' + date.getMinutes()).slice(-2);
-    }
-
-    // month
-    function month(date) {
-      return ('0'+(date.getMonth()+1)).slice(-2);
-    }
-
-    // month_name
-    function month_name(date) {
-      return months[date.getMonth()];
-    }
-
-    // month_name_abbr
-    function month_name_abbr(date) {
-      return abbr_months[date.getMonth()];
-    }
-
-    // second
-    function second(date) {
-      return ('0' + date.getSeconds()).slice(-2);
-    }
-
-    // time_zone_offset
-    function time_zone_offset(date) {
-      var tz_offset = date.getTimezoneOffset();
-      return (tz_offset >= 0 ? '-' : '') + ('0' + (tz_offset / 60)).slice(-2) + ':' + ('0' + (tz_offset % 60)).slice(-2);
-    }
-
-    // week_number_from_sunday
-    function week_number_from_sunday(date) {
-      return ('0' + Math.round(parseInt(day_of_year(date), 10) / 7)).slice(-2);
-    }
-
-    // weekday_name
-    function weekday_name(date) {
-      return days[date.getDay()];
-    }
-
-    // weekday_name_abbr
-    function weekday_name_abbr(date) {
-      return abbr_days[date.getDay()];
-    }
-
-    // year
-    function year(date) {
-      return date.getFullYear() + '';
-    }
-
-    // year_abbr
-    function year_abbr(date) {
-      return year(date).slice(-2);
-    }
-
-    /*------------------------------ Main ------------------------------*/
-    function strftime(format) {
-      var match, output = format;
-      cache['start_of_year'] = new Date("Jan 1 " + this.getFullYear());
-
-      while (match = regexp.exec(format)) {
-        if (match[1] in formats) {
-          output = output.replace(new RegExp(match[0], 'mg'), formats[match[1]](this));
-        }
-      }
-
-      return output;
-    }
-
-    return strftime;
-  })();
-}
