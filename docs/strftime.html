@@ -1,0 +1,128 @@
+<!DOCTYPE html>  <html> <head>   <title>strftime.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="delorean.html">                 delorean.coffee               </a>                                           <a class="source" href="strftime.html">                 strftime.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               strftime.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">if</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nb">Date</span><span class="o">::</span><span class="nx">setISO8601</span><span class="p">)</span>
+  <span class="nb">Date</span><span class="o">::</span><span class="nv">setISO8601 = </span><span class="nf">(string) -&gt;</span>
+    <span class="nv">regexp = </span><span class="s2">&quot;([0-9]{4})(-([0-9]{2})(-([0-9]{2})&quot;</span> <span class="o">+</span> <span class="s2">&quot;(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(.([0-9]+))?)?&quot;</span> <span class="o">+</span> <span class="s2">&quot;(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?&quot;</span>
+    <span class="nv">d = </span><span class="nx">string</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">regexp</span><span class="p">))</span>
+    <span class="nv">offset = </span><span class="mi">0</span>
+    <span class="nv">date = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">d</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="nx">date</span><span class="p">.</span><span class="nx">setMonth</span> <span class="nx">d</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>  <span class="k">if</span> <span class="nx">d</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="nx">date</span><span class="p">.</span><span class="nx">setDate</span> <span class="nx">d</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>  <span class="k">if</span> <span class="nx">d</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+    <span class="nx">date</span><span class="p">.</span><span class="nx">setHours</span> <span class="nx">d</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>  <span class="k">if</span> <span class="nx">d</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+    <span class="nx">date</span><span class="p">.</span><span class="nx">setMinutes</span> <span class="nx">d</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>  <span class="k">if</span> <span class="nx">d</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+    <span class="nx">date</span><span class="p">.</span><span class="nx">setSeconds</span> <span class="nx">d</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>  <span class="k">if</span> <span class="nx">d</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+    <span class="nx">date</span><span class="p">.</span><span class="nx">setMilliseconds</span> <span class="nb">Number</span><span class="p">(</span><span class="s2">&quot;0.&quot;</span> <span class="o">+</span> <span class="nx">d</span><span class="p">[</span><span class="mi">12</span><span class="p">])</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="k">if</span> <span class="nx">d</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nx">d</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span>
+      <span class="nv">offset = </span><span class="p">(</span><span class="nb">Number</span><span class="p">(</span><span class="nx">d</span><span class="p">[</span><span class="mi">16</span><span class="p">])</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="nb">Number</span><span class="p">(</span><span class="nx">d</span><span class="p">[</span><span class="mi">17</span><span class="p">])</span>
+      <span class="nx">offset</span> <span class="o">*=</span> <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nx">d</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="k">then</span> <span class="mi">1</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nx">offset</span> <span class="o">-=</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getTimezoneOffset</span><span class="p">()</span>
+    <span class="nv">time = </span><span class="p">(</span><span class="nb">Number</span><span class="p">(</span><span class="nx">date</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nx">offset</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
+    <span class="nx">@setTime</span> <span class="nb">Number</span><span class="p">(</span><span class="nx">time</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nb">Date</span><span class="o">::</span><span class="nx">toISOString</span><span class="p">)</span>
+  <span class="nb">Date</span><span class="o">::</span><span class="nv">toISOString = </span><span class="o">-&gt;</span>
+    <span class="nx">@getUTCFullYear</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">@getUTCMonth</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">).</span><span class="nx">toPaddedString</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nx">@getUTCDate</span><span class="p">().</span><span class="nx">toPaddedString</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;T&quot;</span> <span class="o">+</span> <span class="nx">@getUTCHours</span><span class="p">().</span><span class="nx">toPaddedString</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nx">@getUTCMinutes</span><span class="p">().</span><span class="nx">toPaddedString</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nx">@getUTCSeconds</span><span class="p">().</span><span class="nx">toPaddedString</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;Z&quot;</span>
+
+<span class="k">if</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nb">Number</span><span class="o">::</span><span class="nx">toPaddedString</span><span class="p">)</span>
+  <span class="nb">Number</span><span class="o">::</span><span class="nv">toPaddedString = toPaddedString = </span><span class="nf">(length, radix) -&gt;</span>
+    <span class="nv">string = </span><span class="nx">@toString</span><span class="p">(</span><span class="nx">radix</span> <span class="o">or</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="s2">&quot;0&quot;</span><span class="p">.</span><span class="nx">times</span><span class="p">(</span><span class="nx">length</span> <span class="o">-</span> <span class="nx">string</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="o">+</span> <span class="nx">string</span>
+
+<span class="k">if</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nb">Date</span><span class="o">::</span><span class="nx">strftime</span><span class="p">)</span>
+  <span class="nb">Date</span><span class="o">::</span><span class="nv">strftime = </span><span class="p">(</span><span class="o">-&gt;</span>
+    <span class="nv">day = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">date</span><span class="p">.</span><span class="nx">getDate</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span>
+    <span class="nv">day_of_week = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">date</span><span class="p">.</span><span class="nx">getDay</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span>
+    <span class="nv">day_of_year = </span><span class="nf">(date) -&gt;</span>
+      <span class="p">(((</span><span class="nx">date</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">-</span> <span class="nx">cache</span><span class="p">[</span><span class="s2">&quot;start_of_year&quot;</span><span class="p">].</span><span class="nx">getTime</span><span class="p">())</span> <span class="o">/</span> <span class="nx">day_in_ms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="p">).</span><span class="nx">split</span><span class="p">(</span><span class="sr">/\./</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nv">day_padded = </span><span class="nf">(date) -&gt;</span>
+      <span class="p">(</span><span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nx">day</span><span class="p">(</span><span class="nx">date</span><span class="p">)).</span><span class="nx">slice</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="nv">default_local = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">date</span><span class="p">.</span><span class="nx">toLocaleString</span><span class="p">()</span>
+    <span class="nv">default_local_date = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">date</span><span class="p">.</span><span class="nx">toLocaleDateString</span><span class="p">()</span>
+    <span class="nv">default_local_time = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">date</span><span class="p">.</span><span class="nx">toLocaleTimeString</span><span class="p">()</span>
+    <span class="nv">hour = </span><span class="nf">(date) -&gt;</span>
+      <span class="nv">hour = </span><span class="nx">date</span><span class="p">.</span><span class="nx">getHours</span><span class="p">()</span>
+      <span class="k">if</span> <span class="nx">hour</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="nv">hour = </span><span class="mi">12</span>
+      <span class="k">else</span> <span class="nx">hour</span> <span class="o">-=</span> <span class="mi">12</span>  <span class="k">if</span> <span class="nx">hour</span> <span class="o">&gt;</span> <span class="mi">12</span>
+      <span class="nx">hour</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span>
+    <span class="nv">hour_24 = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">date</span><span class="p">.</span><span class="nx">getHours</span><span class="p">()</span>
+    <span class="nv">hour_24_padded = </span><span class="nf">(date) -&gt;</span>
+      <span class="p">(</span><span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nx">hour_24</span><span class="p">(</span><span class="nx">date</span><span class="p">)).</span><span class="nx">slice</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="nv">hour_padded = </span><span class="nf">(date) -&gt;</span>
+      <span class="p">(</span><span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nx">hour</span><span class="p">(</span><span class="nx">date</span><span class="p">)).</span><span class="nx">slice</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="nv">meridian = </span><span class="nf">(date) -&gt;</span>
+      <span class="p">(</span><span class="k">if</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getHours</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">12</span> <span class="k">then</span> <span class="s2">&quot;pm&quot;</span> <span class="k">else</span> <span class="s2">&quot;am&quot;</span><span class="p">)</span>
+    <span class="nv">meridian_upcase = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">meridian</span><span class="p">(</span><span class="nx">date</span><span class="p">).</span><span class="nx">toUpperCase</span><span class="p">()</span>
+    <span class="nv">minute = </span><span class="nf">(date) -&gt;</span>
+      <span class="p">(</span><span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getMinutes</span><span class="p">()).</span><span class="nx">slice</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="nv">month = </span><span class="nf">(date) -&gt;</span>
+      <span class="p">(</span><span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">date</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)).</span><span class="nx">slice</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="nv">month_name = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">months</span><span class="p">[</span><span class="nx">date</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()]</span>
+    <span class="nv">month_name_abbr = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">abbr_months</span><span class="p">[</span><span class="nx">date</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()]</span>
+    <span class="nv">second = </span><span class="nf">(date) -&gt;</span>
+      <span class="p">(</span><span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nx">date</span><span class="p">.</span><span class="nx">getSeconds</span><span class="p">()).</span><span class="nx">slice</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="nv">time_zone_offset = </span><span class="nf">(date) -&gt;</span>
+      <span class="nv">tz_offset = </span><span class="nx">date</span><span class="p">.</span><span class="nx">getTimezoneOffset</span><span class="p">()</span>
+      <span class="p">(</span><span class="k">if</span> <span class="nx">tz_offset</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">then</span> <span class="s2">&quot;-&quot;</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">tz_offset</span> <span class="err">/ 60)).slice(-2) + &quot;:&quot; + (&quot;0&quot; + (tz_offset % 60)).slice(-2)</span>
+    <span class="nv">week_number_from_sunday = </span><span class="nf">(date) -&gt;</span>
+      <span class="p">(</span><span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">day_of_year</span><span class="p">(</span><span class="nx">date</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span> <span class="o">/</span> <span class="mi">7</span><span class="p">)).</span><span class="nx">slice</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="nv">weekday_name = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">days</span><span class="p">[</span><span class="nx">date</span><span class="p">.</span><span class="nx">getDay</span><span class="p">()]</span>
+    <span class="nv">weekday_name_abbr = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">abbr_days</span><span class="p">[</span><span class="nx">date</span><span class="p">.</span><span class="nx">getDay</span><span class="p">()]</span>
+    <span class="nv">year = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">date</span><span class="p">.</span><span class="nx">getFullYear</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span>
+    <span class="nv">year_abbr = </span><span class="nf">(date) -&gt;</span>
+      <span class="nx">year</span><span class="p">(</span><span class="nx">date</span><span class="p">).</span><span class="nx">slice</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="nv">strftime = </span><span class="nf">(format) -&gt;</span>
+      <span class="nv">output = </span><span class="nx">format</span>
+      <span class="nx">cache</span><span class="p">[</span><span class="s2">&quot;start_of_year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s2">&quot;Jan 1 &quot;</span> <span class="o">+</span> <span class="nx">@getFullYear</span><span class="p">())</span>
+      <span class="k">while</span> <span class="nv">match = </span><span class="nx">regexp</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">format</span><span class="p">)</span>
+        <span class="nv">output = </span><span class="nx">output</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">match</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;mg&quot;</span><span class="p">),</span> <span class="nx">formats</span><span class="p">[</span><span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]](</span><span class="k">this</span><span class="p">))</span>  <span class="k">if</span> <span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">of</span> <span class="nx">formats</span>
+      <span class="nx">output</span>
+    <span class="nv">cache = start_of_year: </span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s2">&quot;Jan 1 &quot;</span> <span class="o">+</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()).</span><span class="nx">getFullYear</span><span class="p">())</span>
+    <span class="nv">regexp = </span><span class="sr">/%([a-z]|%)/g</span>
+    <span class="nv">day_in_ms = </span><span class="mi">1000</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">24</span>
+    <span class="nv">days = </span><span class="p">[</span> <span class="s2">&quot;Sunday&quot;</span><span class="p">,</span> <span class="s2">&quot;Monday&quot;</span><span class="p">,</span> <span class="s2">&quot;Tuesday&quot;</span><span class="p">,</span> <span class="s2">&quot;Wednesday&quot;</span><span class="p">,</span> <span class="s2">&quot;Thursday&quot;</span><span class="p">,</span> <span class="s2">&quot;Friday&quot;</span><span class="p">,</span> <span class="s2">&quot;Saturday&quot;</span> <span class="p">]</span>
+    <span class="nv">months = </span><span class="p">[</span> <span class="s2">&quot;January&quot;</span><span class="p">,</span> <span class="s2">&quot;February&quot;</span><span class="p">,</span> <span class="s2">&quot;March&quot;</span><span class="p">,</span> <span class="s2">&quot;April&quot;</span><span class="p">,</span> <span class="s2">&quot;May&quot;</span><span class="p">,</span> <span class="s2">&quot;June&quot;</span><span class="p">,</span> <span class="s2">&quot;July&quot;</span><span class="p">,</span> <span class="s2">&quot;August&quot;</span><span class="p">,</span> <span class="s2">&quot;September&quot;</span><span class="p">,</span> <span class="s2">&quot;October&quot;</span><span class="p">,</span> <span class="s2">&quot;November&quot;</span><span class="p">,</span> <span class="s2">&quot;December&quot;</span> <span class="p">]</span>
+    <span class="nv">abbr_days = </span><span class="p">[</span> <span class="s2">&quot;Sun&quot;</span><span class="p">,</span> <span class="s2">&quot;Mon&quot;</span><span class="p">,</span> <span class="s2">&quot;Tue&quot;</span><span class="p">,</span> <span class="s2">&quot;Wed&quot;</span><span class="p">,</span> <span class="s2">&quot;Thu&quot;</span><span class="p">,</span> <span class="s2">&quot;Fri&quot;</span><span class="p">,</span> <span class="s2">&quot;Sat&quot;</span> <span class="p">]</span>
+    <span class="nv">abbr_months = </span><span class="p">[</span> <span class="s2">&quot;Jan&quot;</span><span class="p">,</span> <span class="s2">&quot;Feb&quot;</span><span class="p">,</span> <span class="s2">&quot;Mar&quot;</span><span class="p">,</span> <span class="s2">&quot;Apr&quot;</span><span class="p">,</span> <span class="s2">&quot;May&quot;</span><span class="p">,</span> <span class="s2">&quot;Jun&quot;</span><span class="p">,</span> <span class="s2">&quot;Jul&quot;</span><span class="p">,</span> <span class="s2">&quot;Aug&quot;</span><span class="p">,</span> <span class="s2">&quot;Sep&quot;</span><span class="p">,</span> <span class="s2">&quot;Oct&quot;</span><span class="p">,</span> <span class="s2">&quot;Nov&quot;</span><span class="p">,</span> <span class="s2">&quot;Dec&quot;</span> <span class="p">]</span>
+    <span class="nv">formats =</span>
+      <span class="nv">a: </span><span class="nx">weekday_name_abbr</span>
+      <span class="nv">A: </span><span class="nx">weekday_name</span>
+      <span class="nv">b: </span><span class="nx">month_name_abbr</span>
+      <span class="nv">B: </span><span class="nx">month_name</span>
+      <span class="nv">c: </span><span class="nx">default_local</span>
+      <span class="nv">d: </span><span class="nx">day_padded</span>
+      <span class="nv">e: </span><span class="nx">day</span>
+      <span class="nv">H: </span><span class="nx">hour_24_padded</span>
+      <span class="nv">I: </span><span class="nx">hour_padded</span>
+      <span class="nv">j: </span><span class="nx">day_of_year</span>
+      <span class="nv">k: </span><span class="nx">hour_24</span>
+      <span class="nv">l: </span><span class="nx">hour</span>
+      <span class="nv">m: </span><span class="nx">month</span>
+      <span class="nv">M: </span><span class="nx">minute</span>
+      <span class="nv">p: </span><span class="nx">meridian_upcase</span>
+      <span class="nv">P: </span><span class="nx">meridian</span>
+      <span class="nv">S: </span><span class="nx">second</span>
+      <span class="nv">U: </span><span class="nx">week_number_from_sunday</span>
+      <span class="nv">w: </span><span class="nx">day_of_week</span>
+      <span class="nv">x: </span><span class="nx">default_local_date</span>
+      <span class="nv">X: </span><span class="nx">default_local_time</span>
+      <span class="nv">y: </span><span class="nx">year_abbr</span>
+      <span class="nv">Y: </span><span class="nx">year</span>
+      <span class="nv">z: </span><span class="nx">time_zone_offset</span>
+      <span class="s2">&quot;%&quot;</span><span class="o">:</span> <span class="o">-&gt;</span>
+        <span class="s2">&quot;%&quot;</span>
+
+    <span class="nx">strftime</span>
+  <span class="p">)()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

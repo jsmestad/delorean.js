@@ -1,5 +1,6 @@
 fs     = require 'fs'
-{exec} = require 'child_process'
+{exec, spawn} = require 'child_process'
+{print} = require 'sys'
 
 appFiles  = [
   # omit src/ and .coffee to make the below lines a little shorter
@@ -28,3 +29,11 @@ task 'minify', 'Minify the resulting application file after build', ->
   exec 'java -jar "./lib/compiler.jar" --js ./delorean.js --js_output_file ./delorean.min.js', (err, stdout, stderr) ->
     throw err if err
     console.log stdout + stderr
+
+task 'docs', 'Generate annotated source code with Docco', ->
+  fs.readdir 'src', (err, contents) ->
+    files = ("src/#{file}" for file in contents when /\.coffee$/.test file)
+    docco = spawn 'docco', files
+    docco.stdout.on 'data', (data) -> print data.toString()
+    docco.stderr.on 'data', (data) -> print data.toString()
+    docco.on 'exit', (status) -> callback?() if status is 0
