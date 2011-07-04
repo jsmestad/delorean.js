@@ -615,13 +615,10 @@
       }
     };
   };
-  /* $.delorean
-  # This will initialize a new Delorean.js chart.
-  #
-  #     var chart = $.delorean(#chart_id, {...data...}, {...options...});
-  
-  $.delorean = (target, data, options) ->
-    delorean = new Delorean()
-    delorean.init target, data, options
-    delorean*/
+  $.delorean = function(target, data, options) {
+    var delorean;
+    delorean = new Delorean();
+    delorean.init(target, data, options);
+    return delorean;
+  };
 }).call(this);
