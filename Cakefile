@@ -18,7 +18,7 @@ task 'build', 'Build single application file from source files', ->
   process = ->
     fs.writeFile './delorean.coffee', appContents.join('\n\n'), 'utf8', (err) ->
       throw err if err
-      exec 'coffee --compile ./delorean.coffee', (err, stdout, stderr) ->
+      exec 'coffee -l --compile ./delorean.coffee', (err, stdout, stderr) ->
         throw err if err
         console.log stdout + stderr
         fs.unlink './delorean.coffee', (err) ->

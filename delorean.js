@@ -187,6 +187,9 @@
       return strftime;
     })();
   }
+  /* Features
+  #
+  */
   Delorean = function(options) {
     var calculateLabelWidth, displayValue, distillData, log, mean, median, mode, parseDate, range, selectColor, tintColor, tooltip;
     options = {

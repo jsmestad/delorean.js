@@ -16,6 +16,35 @@
 # available on GitHub, and released under the Apache license.
 #
 
+### Features
+#
+#### Data Distillation _(also known as Trending)_
+# Delorean.js allows users to pass a large dataset, 60 days worth of
+# hourly data for example, and graph it into a constrainted area of
+# your web application. When enabling distillation, Delorean.js
+# will take the 17,280 data points, calculate that it can only graph
+# 42 points in a 700px wide graph, group them into groups of ~412
+# data points, calculate the average, and render the chart.
+#
+# This allows web developers to use Javascript localStorage and only
+# fetch a given dataset once. When you resize the graph, just ask
+# delorean to recalculate the distillation.
+#
+#### Outliers _(work in progress)_
+# Delorean.js has an outliers mode. This is similar to data distillation,
+# but it is used to isolate outliers (in our case we call an outlier,
+# anything that is two standard deviations from the mean). The reason
+# we do this is to eliminate the use-case where a single bad data point
+# will blow out the scale of the y-axis making the graph useless.
+#
+#### No Tick Interval
+# Leave behind the dreaded tick interval configuration. Delorean.js uses
+# the first two data points to calculate the interval of your graph. This
+# greatly simplifies and improves the perfomrance of the codebase, but
+# means that you better cleanse your dataset before passing it to the
+# client. Sorry, but we don't believe in giving developers saftey scissors.
+
+
 #### Usage
 #
 # The JSON object for a single delorean.js line graph looks like:
@@ -47,51 +76,74 @@ Delorean = (options) ->
 
   ## Configuration Options
 
-  # *line_colors*
+  # * **line_colors** -- a set of colors in hex format that are used sequentially.
+  #   If more lines are requested than exist in the array, Delorean.js will
+  #   automatically ligthen and darken the original colors (see tintColor helper
+  #   to see how this works).
+  #   *Default:* `["#4da74d", "#afd8f8", "#edc240", "#cb4b4b", "#9440ed"]`
   #
-  # *line_labels* accepts an array of Strings that allow you to configure
-  # labels for each of the lines passed into the array.
+  # * **line_labels** -- accepts an array of Strings that allow you to configure
+  #   labels for each of the lines passed into the array.
+  #   *Example:* `["Total", "Reads", "Writes", "Inserts"]`  
+  #   *Default:* `[]`
   #
-  #    ["Total", "Reads", "Writes", "Inserts"]
+  # * **date_format** -- configures the display of the dates across the x-axis.
+  #   See strftime.js for example usage.  
+  #   *Default:* `'%m/%d` meaning Jan 01 is 01/01
   #
-  # *date_format* configures the display of the dates across the x-axis.
-  # See strftime.js for example usage.
+  # * **height** and **width** -- accepts an integer value to determine the size
+  #   of the resulting graph
   #
-  # *height* and *width* accept integer values to determine the size of the
-  # resulting graph
+  # * **label\_display\_count** -- accepts an integer value that sets the number of
+  #   y-axis labels to calculate and display.
   #
-  # *label_display_count* accepts an integer value that sets the number of
-  # y-axis labels to calculate and display.
+  # * **label_offset** -- is a number of pixels to offset the x-axis labels, this
+  #   is similar to padding-left for the graph. This should not require any tweaking,
+  #   unless you change the label css.
   #
-  # *label_offset* is a number of pixels to offset the x-axis labels, this
-  # is similar to padding-left for the graph
+  # * **margin_left** -- sets the left margin for the graph
   #
-  # *margin_left* sets the left margin for the graph
-  # *margin_bottom* sets the bottom margin for the graph
-  # *margin_top* sets the top margin for the graph
+  # * **margin_bottom** -- sets the bottom margin for the graph
   #
-  # *text_date*
+  # * **margin_top** -- sets the top margin for the graph
   #
-  # *text_metric*
+  # * **text_date**
   #
-  # *trend*
+  # * **text_metric**
   #
-  # *grid_color*
+  # * **trend** -- enable or disable data trending. When enabled, delorean will
+  #   calculate the maximum amount of points that it can graph while maintaining
+  #   visual appeal and then group and average the points together. See distillData
+  #   for the code.  
+  #   *Default:* `false`
   #
-  # *display_x_grid* and *display_y_grid* are boolean flags that enable or
-  # disable drawing axis grid lines.
+  # * **grid_color** -- set the hex color for the x and y axis grid lines.  
+  #   *Default:* `#f5f5f5` which is a very light gray
   #
-  # *stroke_width*
-  # *stroke_width_dense*
+  # * **display_x_grid** and *display_y_grid* -- are boolean flags that enable or
+  #   disable drawing axis grid lines.  
+  #   *Default:* `true`
   #
-  # *point_size*
-  # *point_size_hover*
+  # * **stroke_width**
   #
-  # *enable_tooltips* is a boolean flag to enable or disable tooltips. See
-  # tooltip documentation below for more information.
+  # * **stroke\_width\_dense**
   #
-  # *verify_libraries* is a boolean flag to enable crude dependency checking
-  # at runtime.
+  # * **point_size** -- the pixel size of each point in it's default state. Note, that
+  #   this functionality currently is overriden when trending is turned on, or you have
+  #   more than 45 data points. This will be fixed in an upcoming release.  
+  #   *Default:* `5`
+  #
+  # * **point\_size\_hover** -- the pixel size of points when they are hovered over. See
+  #   note in the point_size definition, this variable is bound to this same constraint.  
+  #   *Default:* `7`
+  #
+  # * **enable_tooltips** -- is a boolean flag to enable or disable tooltips. See
+  #   tooltip documentation below for more information.  
+  #   *Default:* `false`
+  #
+  # * **verify_libraries** -- is a boolean flag to enable crude dependency checking
+  #   at runtime.  
+  #   *Default:* `true`
   #
   options =
     line_colors: [ "#4da74d", "#afd8f8", "#edc240", "#cb4b4b", "#9440ed" ]
@@ -442,9 +494,9 @@ Delorean = (options) ->
     raw_data = _.clone(data_)
     data = (if options.trend == true then distillData(raw_data, true) else raw_data)
     if options.verify_libraries
-      throw "You must include the strftime.js file before executing Delorean.js"  if _.isUndefined(Date::strftime) or _.isUndefined(Date::setISO8601)
-      throw "You must include the raphael.js file before executing Delorean.js"  if _.isUndefined(Raphael)
-      throw "You must include the raphael.path.methods.js file before executing Delorean.js"  if _.isUndefined(Raphael.el.lineTo)
+      throw "You must include the strftime.js file before executing Delorean.js" if _.isUndefined(Date::strftime) or _.isUndefined(Date::setISO8601)
+      throw "You must include the raphael.js file before executing Delorean.js" if _.isUndefined(Raphael)
+      throw "You must include the raphael.path.methods.js file before executing Delorean.js" if _.isUndefined(Raphael.el.lineTo)
     chart = $(target_)
     chart.children().remove()
     r = Raphael(chart.get(0), options.width, options.height)
