@@ -4,12 +4,15 @@ GEM
     activesupport (3.0.7)
     compass (0.10.6)
       haml (>= 3.0.4)
-    haml (3.0.25)
+    haml (5.0.0)
+      temple (>= 0.8.0)
+      tilt
     i18n (0.4.2)
     rack (1.6.12)
     sinatra (1.1.2)
       rack (~> 1.1)
       tilt (~> 1.2)
+    temple (0.8.2)
     tilt (1.2.1)
 
 PLATFORMS
@@ -18,6 +21,6 @@ PLATFORMS
 DEPENDENCIES
   activesupport (~> 3.0.7)
   compass (~> 0.10.6)
-  haml (~> 3.0.25)
+  haml (~> 5.0.0)
   i18n (~> 0.4.2)
   sinatra (~> 1.1.2)
