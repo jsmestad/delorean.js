@@ -4,5 +4,5 @@ gem 'sinatra',  '~> 1.1.2'
 gem 'haml',     '~> 3.0.25'
 gem 'compass',  '~> 0.10.6'
 
-gem 'i18n', '~> 0.4.2'
+gem 'i18n', '~> 0.6.8'
 gem 'activesupport', '~> 3.1.12'
