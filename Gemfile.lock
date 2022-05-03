@@ -10,12 +10,19 @@ GEM
       tilt
     i18n (0.4.2)
     multi_json (1.14.1)
-    rack (1.6.12)
-    sinatra (1.1.2)
-      rack (~> 1.1)
-      tilt (~> 1.2)
+    mustermann (1.1.1)
+      ruby2_keywords (~> 0.0.1)
+    rack (2.2.3)
+    rack-protection (2.2.0)
+      rack
+    ruby2_keywords (0.0.5)
+    sinatra (2.2.0)
+      mustermann (~> 1.0)
+      rack (~> 2.2)
+      rack-protection (= 2.2.0)
+      tilt (~> 2.0)
     temple (0.8.2)
-    tilt (1.2.1)
+    tilt (2.0.10)
 
 PLATFORMS
   ruby
@@ -25,4 +32,4 @@ DEPENDENCIES
   compass (~> 0.10.6)
   haml (~> 5.0.0)
   i18n (~> 0.4.2)
-  sinatra (~> 1.1.2)
+  sinatra (~> 2.2.0)
